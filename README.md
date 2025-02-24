@@ -1,11 +1,42 @@
-# Cesium starter
+# CesiumLite 地图包
 
-## start dev
+## 项目简介
 
-- `yarn dev` or `npm run dev`
+CesiumLite 是一个基于 Cesium 的二次开发地图包，旨在封装常见的地图功能模块，便于在多个前端项目中复用。该地图包提供地图初始化、控件、图层管理、标注绘制、空间分析等基础功能。
 
-## build:
+## 功能模块
 
-- `yarn build` or `npm run build`
+1. **地图初始化模块**：初始化 Cesium 地图实例，设置基础视图和相关参数。
+2. **地图控件模块**：提供交互控件，如缩放、平移、全屏、比例尺、导航控件等。
+3. **图层管理模块**：支持添加、删除、切换影像图层、矢量图层、标注图层等。
+4. **标注与绘制模块**：支持绘制点、线、面等几何图形，并提供样式设置。
+5. **相机控制模块**：支持动态调整地图视角，飞行到指定位置等功能。
+6. **地理信息查询模块**：支持空间数据的检索和交互。
+7. **动画与效果模块**：支持地图上的动画和效果展示。
+8. **空间分析模块**：提供空间数据分析功能。
+9. **事件监听与自定义事件模块**：支持自定义事件的监听与触发。
+10. **用户配置与样式模块**：支持地图样式和配置的定制化管理。
 
-more options checkout: [vite-plugin-cesium](https://github.com/nshen/vite-plugin-cesium)
+## 使用方法
+
+### 开发环境
+
+- 启动开发服务器：`yarn dev` 或 `npm run dev`
+- 构建项目：`yarn build` 或 `npm run build`
+
+### 在 HTML 中引入
+
+在 HTML 文件中使用以下方式引入 `index.js`：
+
+```html
+<script src="src/index.js"></script>
+```
+
+### 在 JavaScript 中使用
+
+```javascript
+import CesiumLite from './index.js';
+
+const cesiumLite = new CesiumLite('cesiumContainer', { /* options */ });
+// 这里可以添加更多的初始化代码
+```
