@@ -6,14 +6,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Create-Cesium 🌏</title>
     <script type="module" src="/src/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <style>
+      #cesiumContainer {
+        width: 100%;
+        height: 100vh;
+      }
+      .dg.main {
+        position: absolute;
+        top: 10px;
+        right: 200px;
+        z-index: 1000;
+      }
+    </style>
   </head>
   <body>
     <div id="cesiumContainer"></div>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        const cesiumLite = new CesiumLite('cesiumContainer', { /* options */ });
-        // 这里可以添加更多的初始化代码
+        const cesiumLite = new CesiumLite('cesiumContainer', {
+          map: {
+            baseMap: {
+              id: 'imagery'
+            },
+            camera: {
+              longitude: 116.397428,
+              latitude: 39.90923,
+              height: 1000000,
+              heading: 0,
+              pitch: -90,
+              roll: 0
+            }
+          }
+        });
+
+        const gui = new dat.GUI();
         
+        const cameraParams = {
+          longitude: 116.397428,
+          latitude: 39.90923,
+          height: 1000000,
+          heading: 0,
+          pitch: -90,
+          roll: 0,
+          flyTo: () => {
+            cesiumLite.cameraControl.flyTo({
+              longitude: cameraParams.longitude,
+              latitude: cameraParams.latitude,
+              height: cameraParams.height,
+              heading: cameraParams.heading,
+              pitch: cameraParams.pitch,
+              roll: cameraParams.roll,
+              duration: 2
+            });
+          },
+          setView: () => {
+            cesiumLite.cameraControl.setView({
+              longitude: cameraParams.longitude,
+              latitude: cameraParams.latitude,
+              height: cameraParams.height,
+              heading: cameraParams.heading,
+              pitch: cameraParams.pitch,
+              roll: cameraParams.roll
+            });
+          }
+        };
+
+        gui.add(cameraParams, 'longitude', -180, 180).name('经度');
+        gui.add(cameraParams, 'latitude', -90, 90).name('纬度');
+        gui.add(cameraParams, 'height', 1000, 2000000).name('高度');
+        gui.add(cameraParams, 'heading', -180, 180).name('方向角');
+        gui.add(cameraParams, 'pitch', -90, 90).name('俯仰角');
+        gui.add(cameraParams, 'roll', -180, 180).name('翻滚角');
+        gui.add(cameraParams, 'flyTo').name('飞行到指定视角');
+        gui.add(cameraParams, 'setView').name('设置视角');
+
+        const basemapFolder = gui.addFolder('底图切换');
+        const basemapParams = {
+          imagery: () => cesiumLite.basemapControl.switchBasemap('imagery'),
+          gaode: () => cesiumLite.basemapControl.switchBasemap('gaode'),
+          osm: () => cesiumLite.basemapControl.switchBasemap('osm')
+        };
+        basemapFolder.add(basemapParams, 'imagery').name('影像地图');
+        basemapFolder.add(basemapParams, 'gaode').name('高德地图');
+        basemapFolder.add(basemapParams, 'osm').name('OSM地图');
+
+        const alphaFolder = gui.addFolder('底图透明度');
+        const alphaParams = {
+          alpha: 1.0,
+          setAlpha: () => {
+            const currentBasemap = cesiumLite.basemapControl.getCurrentBasemap();
+            if (currentBasemap) {
+              cesiumLite.basemapControl.setBasemapAlpha(currentBasemap.id, alphaParams.alpha);
+            }
+          }
+        };
+        alphaFolder.add(alphaParams, 'alpha', 0, 1).name('透明度');
+        alphaFolder.add(alphaParams, 'setAlpha').name('应用透明度');
       });
     </script>
   </body>

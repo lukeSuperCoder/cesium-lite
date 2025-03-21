@@ -5,6 +5,7 @@ import {
     WebMapTileServiceImageryProvider,
     OpenStreetMapImageryProvider,
     BingMapsImageryProvider,
+    UrlTemplateImageryProvider,
 } from 'cesium';
 
 class BasemapControl {
@@ -42,20 +43,24 @@ class BasemapControl {
             visible: false
         });
 
-        // 添加矢量底图
-        this.addBasemap('vector', {
-            id: 'vector',
-            name: '矢量底图',
-            provider: imageryProvider,
-            visible: false
-        });
-
         // 添加OpenStreetMap底图
         this.addBasemap('osm', {
             id: 'osm',
             name: 'OpenStreetMap',
             provider: new OpenStreetMapImageryProvider({
                 url: 'https://tile.openstreetmap.org/'
+            }),
+            visible: false
+        });
+
+        // 或使用高德地图
+        this.addBasemap('gaode', {
+            id: 'gaode',
+            name: '高德底图',
+            provider: new UrlTemplateImageryProvider({
+                url: 'https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+                minimumLevel: 0,
+                maximumLevel: 18
             }),
             visible: false
         });
