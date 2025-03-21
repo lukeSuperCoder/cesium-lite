@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基本地图示例</title>
-</head>
-<body>
-    <div id="map" style="width: 100%; height: 100vh;"></div> <!-- 设置地图容器的宽高 -->
-    <script type="module" src="../src/index.js"></script> <!-- 引用打包后的JavaScript文件 -->
-    <!-- 引入Cesium库 -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create-Cesium 🌏</title>
+    <script type="module" src="/src/index.js"></script>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
     <script>
-        // 初始化地图
-        const map = new CesiumLite('map');
-        console.log(map);
+      document.addEventListener('DOMContentLoaded', () => {
+        const cesiumLite = new CesiumLite('cesiumContainer', { /* options */ });
+        // 这里可以添加更多的初始化代码
+        
+      });
     </script>
-</body>
+  </body>
 </html>

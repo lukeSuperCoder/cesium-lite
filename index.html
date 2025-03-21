@@ -1,19 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create-Cesium 🌏</title>
+    <title>导航页面 🌏</title>
     <script type="module" src="/src/index.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      ol {
+        padding: 0;
+      }
+      li {
+        margin: 10px 0;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
-    <div id="cesiumContainer"></div>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        const cesiumLite = new CesiumLite('cesiumContainer', { /* options */ });
-        // 这里可以添加更多的初始化代码
-      });
-    </script>
+    <h1>示例导航</h1>
+    <ol>
+      <li><a href="examples/basicMap.html" target="_blank">创建地图</a></li>
+      <!-- 可以在这里添加更多示例链接 -->
+    </ol>
   </body>
 </html>
