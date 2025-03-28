@@ -1,15 +1,29 @@
 import MapCore from './core/map';
 import CameraControl from './camera/cameraControl';
 import BasemapControl from './basemap/basemapControl';
+import FullscreenControl from './controls/fullscreenControl';
+import ZoomControl from './controls/zoomControl';
+import ScaleControl from './controls/scaleControl';
 import './css/main.css';
+import './css/control.css';
 import config from './core/config';
-import { Ion } from 'cesium';
+import { Ion } from 'cesium';   
 export default class CesiumLite {
     constructor(containerId, options={}) {
         Ion.defaultAccessToken = config.token;
         // 默认配置
         const defaultOptions = {
             containerId: containerId,
+            fullscreenButton: false,   // 全屏按钮配置，设置为false表示不显示全屏按钮
+            baseLayerPicker: false,   // 底图选择器配置，设置为false表示不显示底图选择器
+            vrButton: false,         // 虚拟现实按钮配置，设置为false表示不显示VR按钮
+            timeline: false,         // 时间轴配置，设置为false表示不显示时间轴
+            animation: false,        // 动画配置，设置为false表示不启用动画控件
+            homeButton: false,       // 首页按钮配置，设置为false表示不显示Home按钮
+            geocoder: false,         // 地理编码器配置，设置为false表示不启用地理编码器
+            navigationHelpButton: false, // 导航帮助按钮配置，设置为false表示不显示导航帮助按钮
+            sceneModePicker: false,     // 场景模式选择器配置，设置为false表示不显示场景模式选择器
+            baseLayerPicker: false,     // 再次声明底图选择器配置，设置为false表示不显示底图选择器
             // 地图配置
             map: {
                 // 默认底图配置
@@ -31,43 +45,74 @@ export default class CesiumLite {
                     pitch: -90,            // 默认俯仰角
                     roll: 0                // 默认翻滚角
                 },
-                // 动画配置
-                animation: {
-                    enabled: true,         // 启用动画控件
-                    defaultDuration: 3,    // 默认动画时长（秒）
-                    defaultEasing: 'CubicOut' // 默认缓动函数
-                },
-                // 时间配置
-                timeline: {
-                    enabled: true,         // 启用时间轴
-                    currentTime: new Date() // 默认当前时间
-                },
-                // 全屏配置
-                fullscreen: {
-                    enabled: true,         // 启用全屏控件
-                    element: containerId   // 全屏元素
-                },
-                // 导航配置
-                navigation: {
-                    enabled: true,         // 启用导航控件
-                    compass: true,         // 启用指南针
-                    zoom: true,            // 启用缩放
-                    home: true             // 启用Home按钮
+                controls: {
+                    zoomAmount: 10000,
+                    zoom: true,
+                    scale: true,
+                    fullscreen: true
                 }
             }
         };
 
         // 合并用户配置和默认配置
-        this.options = Object.assign({}, defaultOptions, options);
+        this.options = this.deepMerge(defaultOptions, options);
+        // 初始化地图核心模块
         this.mapCore = new MapCore(containerId, this.options);
-        
+
         // 初始化相机控制模块
         this.cameraControl = new CameraControl(this.mapCore.viewer, this.options.map.camera);
         // 初始化底图控制模块
         this.basemapControl = new BasemapControl(this.mapCore.viewer, this.options.map.baseMap);
-        
+        // 初始化全屏控件模块
+        this.fullscreenControl = new FullscreenControl(this.mapCore.viewer, this.options.map.controls);
+        // 初始化缩放控件模块
+        this.zoomControl = new ZoomControl(this.mapCore.viewer, this.options.map.controls);
+        // 初始化比例尺控件模块
+        this.scaleControl = new ScaleControl(this.mapCore.viewer, this.options.map.controls);
+        if(this.options.map.controls.fullscreen) {
+            this.fullscreenControl.show();
+            this.fullscreenControl.setPosition('top-right');
+        } else {
+            this.fullscreenControl.hide();
+        }
+        if(this.options.map.controls.zoom) {
+            this.zoomControl.show();
+            this.zoomControl.setPosition('top-left');
+        } else {
+            this.zoomControl.hide();
+        }
+        if(this.options.map.controls.scale) {    
+            this.scaleControl.show();
+            this.scaleControl.setPosition('bottom-right');
+        } else {
+            this.scaleControl.hide();
+        }
         // 暴露实例到全局
         window.cesiumInstance = this;
+    }
+
+    /**
+     * 深度合并对象
+     * @param {Object} target 目标对象
+     * @param {Object} source 源对象
+     * @returns {Object} 合并后的对象
+     */
+    deepMerge(target, source) {
+        const result = { ...target };
+
+        for (const key in source) {
+            if (source[key] instanceof Object && !Array.isArray(source[key])) {
+                if (key in target) {
+                    result[key] = this.deepMerge(target[key], source[key]);
+                } else {
+                    result[key] = { ...source[key] };
+                }
+            } else if (source[key] !== undefined) {
+                result[key] = source[key];
+            }
+        }
+
+        return result;
     }
 
     /**
