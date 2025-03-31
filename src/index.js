@@ -4,6 +4,8 @@ import BasemapControl from './basemap/basemapControl';
 import FullscreenControl from './controls/fullscreenControl';
 import ZoomControl from './controls/zoomControl';
 import ScaleControl from './controls/scaleControl';
+import DrawTool from './markers/draw';
+import MeasureTool from './markers/measure';
 import './css/main.css';
 import './css/control.css';
 import config from './core/config';
@@ -69,6 +71,11 @@ export default class CesiumLite {
         this.zoomControl = new ZoomControl(this.mapCore.viewer, this.options.map.controls);
         // 初始化比例尺控件模块
         this.scaleControl = new ScaleControl(this.mapCore.viewer, this.options.map.controls);
+        // 初始化绘制控件模块
+        this.drawTool = new DrawTool(this.mapCore.viewer, this.options.map.controls);
+        // 初始化测量工具
+        this.measureTool = new MeasureTool(this.mapCore.viewer);
+        
         if(this.options.map.controls.fullscreen) {
             this.fullscreenControl.show();
             this.fullscreenControl.setPosition('top-right');

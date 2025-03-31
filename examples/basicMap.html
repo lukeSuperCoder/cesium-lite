@@ -18,10 +18,75 @@
         right: 200px;
         z-index: 1000;
       }
+      .draw-control {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: white;
+        padding: 5px;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+      }
+      .draw-control button {
+        display: block;
+        width: 100%;
+        margin: 2px 0;
+        padding: 5px 10px;
+        border: none;
+        background: #4CAF50;
+        color: white;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .draw-control button:hover {
+        background: #45a049;
+      }
+      .draw-control button.active {
+        background: #f44336;
+      }
+      .measure-control {
+        position: absolute;
+        top: 150px;
+        right: 10px;
+        background: white;
+        padding: 5px;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 1000;
+      }
+      .measure-control button {
+        display: block;
+        width: 100%;
+        margin: 2px 0;
+        padding: 5px 10px;
+        border: none;
+        background: #2196F3;
+        color: white;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .measure-control button:hover {
+        background: #1976D2;
+      }
+      .measure-control button.active {
+        background: #f44336;
+      }
     </style>
   </head>
   <body>
     <div id="cesiumContainer"></div>
+    <div class="draw-control">
+      <button id="drawPoint" title="绘制点">点</button>
+      <button id="drawLine" title="绘制线">线</button>
+      <button id="drawPolygon" title="绘制面">面</button>
+      <button id="clearDraw" title="清除绘制">清除</button>
+    </div>
+    <div class="measure-control">
+      <button id="measureDistance" title="测距">测距</button>
+      <button id="measureArea" title="测面">测面</button>
+      <button id="clearMeasure" title="清除测量">清除</button>
+    </div>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const cesiumLite = new CesiumLite('cesiumContainer', {
@@ -103,6 +168,86 @@
         };
         alphaFolder.add(alphaParams, 'alpha', 0, 1).name('透明度');
         alphaFolder.add(alphaParams, 'setAlpha').name('应用透明度');
+
+        // 绘制控件按钮事件
+        const drawButtons = {
+          drawPoint: document.getElementById('drawPoint'),
+          drawLine: document.getElementById('drawLine'),
+          drawPolygon: document.getElementById('drawPolygon'),
+          clearDraw: document.getElementById('clearDraw')
+        };
+
+        // 测量控件按钮事件
+        const measureButtons = {
+          measureDistance: document.getElementById('measureDistance'),
+          measureArea: document.getElementById('measureArea'),
+          clearMeasure: document.getElementById('clearMeasure')
+        };
+
+        // 移除所有按钮的active状态
+        function removeActiveState() {
+          Object.values(drawButtons).forEach(button => {
+            button.classList.remove('active');
+          });
+          Object.values(measureButtons).forEach(button => {
+            button.classList.remove('active');
+          });
+        }
+
+        function getDrawData(data) {
+          console.log(data.polygon.hierarchy.getValue().positions);
+        }
+
+        // 绘制点
+        drawButtons.drawPoint.addEventListener('click', () => {
+          removeActiveState();
+          drawButtons.drawPoint.classList.add('active');
+          cesiumLite.drawTool.draw('Point', getDrawData);
+        });
+
+        // 绘制线
+        drawButtons.drawLine.addEventListener('click', () => {
+          removeActiveState();
+          drawButtons.drawLine.classList.add('active');
+          cesiumLite.drawTool.draw('Polyline', getDrawData);
+        });
+
+        // 绘制面
+        drawButtons.drawPolygon.addEventListener('click', () => {
+          removeActiveState();
+          drawButtons.drawPolygon.classList.add('active');
+          cesiumLite.drawTool.draw('Polygon', getDrawData);
+        });
+
+        // 清除绘制
+        drawButtons.clearDraw.addEventListener('click', () => {
+          removeActiveState();
+          cesiumLite.drawTool.clearAll();
+        });
+
+        // 测距
+        measureButtons.measureDistance.addEventListener('click', () => {
+          removeActiveState();
+          measureButtons.measureDistance.classList.add('active');
+          cesiumLite.measureTool.measureDistance((result) => {
+            console.log('测量距离:', result.distance, '公里');
+          });
+        });
+
+        // 测面
+        measureButtons.measureArea.addEventListener('click', () => {
+          removeActiveState();
+          measureButtons.measureArea.classList.add('active');
+          cesiumLite.measureTool.measureArea((result) => {
+            console.log('测量面积:', result.area, '平方公里');
+          });
+        });
+
+        // 清除测量
+        measureButtons.clearMeasure.addEventListener('click', () => {
+          removeActiveState();
+          cesiumLite.measureTool.clearAll();
+        });
       });
     </script>
   </body>
