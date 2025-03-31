@@ -154,14 +154,27 @@ class BasemapControl {
     }
 
     /**
-     * 设置底图透明度
+     * 设置底图亮度
      * @param {string} id 底图ID
-     * @param {number} alpha 透明度（0-1）
+     * @param {number} brightness 亮度（0-1）
      */
-    setBasemapAlpha(id, alpha) {
+    setBasemapBrightness(id, brightness) {
         const basemap = this.basemaps.get(id);
         if (basemap) {
-            basemap.layer.alpha = Math.max(0, Math.min(1, alpha));
+            // 确保亮度在0-10之间
+            brightness = Math.max(0, Math.min(10, brightness));
+            
+            // 设置图层亮度
+            if (basemap.layer) {
+                basemap.layer.brightness = brightness;
+            }
+            
+            // 如果是图层集合，设置所有子图层的亮度
+            if (basemap.layer.imageryLayers) {
+                basemap.layer.imageryLayers.forEach(layer => {
+                    layer.brightness = brightness;
+                });
+            }
         }
     }
 

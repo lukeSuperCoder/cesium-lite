@@ -156,18 +156,18 @@
         basemapFolder.add(basemapParams, 'gaode').name('高德地图');
         basemapFolder.add(basemapParams, 'osm').name('OSM地图');
 
-        const alphaFolder = gui.addFolder('底图透明度');
+        const alphaFolder = gui.addFolder('底图亮度');
         const alphaParams = {
-          alpha: 1.0,
-          setAlpha: () => {
+          brightness: 1.0,
+          setBrightness: () => {
             const currentBasemap = cesiumLite.basemapControl.getCurrentBasemap();
             if (currentBasemap) {
-              cesiumLite.basemapControl.setBasemapAlpha(currentBasemap.id, alphaParams.alpha);
+              cesiumLite.basemapControl.setBasemapBrightness(currentBasemap.id, alphaParams.brightness);
             }
           }
         };
-        alphaFolder.add(alphaParams, 'alpha', 0, 1).name('透明度');
-        alphaFolder.add(alphaParams, 'setAlpha').name('应用透明度');
+        alphaFolder.add(alphaParams, 'brightness', 0, 10).name('亮度');
+        alphaFolder.add(alphaParams, 'setBrightness').name('应用亮度');
 
         // 绘制控件按钮事件
         const drawButtons = {
