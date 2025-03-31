@@ -52,7 +52,8 @@ export default class CesiumLite {
                     zoom: true,
                     scale: true,
                     fullscreen: true
-                }
+                },
+                drawStyles: {}
             }
         };
 
@@ -72,7 +73,7 @@ export default class CesiumLite {
         // 初始化比例尺控件模块
         this.scaleControl = new ScaleControl(this.mapCore.viewer, this.options.map.controls);
         // 初始化绘制控件模块
-        this.drawTool = new DrawTool(this.mapCore.viewer, this.options.map.controls);
+        this.drawTool = new DrawTool(this.mapCore.viewer, {styles: this.options.map.drawStyles});
         // 初始化测量工具
         this.measureTool = new MeasureTool(this.mapCore.viewer);
         

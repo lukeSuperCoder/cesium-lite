@@ -16,16 +16,56 @@ class DrawTool {
     /**
      * 构造函数
      * @param viewer
+     * @param options 配置选项
      */
-    constructor(viewer, options) {
+    constructor(viewer, options = {}) {
         this.viewer = viewer;
         this._drawHandler = null; //事件
         this._dataSource = null; //存储entities
         this._tempPositions = []; //存储点集合
         this._mousePos = null; //移动点
         this._drawType = null; //类型
-        this.options = options;
         this._originalCursor = null; // 保存原始光标样式
+        
+        // 默认样式配置
+        this.defaultStyles = {
+            point: {
+                color: Color.RED,
+                pixelSize: 10,
+                outlineColor: Color.YELLOW,
+                outlineWidth: 2
+            },
+            polyline: {
+                color: Color.RED,
+                width: 3,
+                material: new PolylineDashMaterialProperty({
+                    color: Color.YELLOW
+                }),
+                depthFailMaterial: new PolylineDashMaterialProperty({
+                    color: Color.YELLOW
+                })
+            },
+            polygon: {
+                color: Color.RED,
+                width: 3,
+                fillColor: Color.RED.withAlpha(0.4),
+                material: new PolylineDashMaterialProperty({
+                    color: Color.YELLOW
+                }),
+                depthFailMaterial: new PolylineDashMaterialProperty({
+                    color: Color.YELLOW
+                })
+            }
+        };
+        
+        // 合并用户配置和默认配置
+        this.options = {
+            styles: {
+                point: { ...this.defaultStyles.point, ...(options.styles?.point || {}) },
+                polyline: { ...this.defaultStyles.polyline, ...(options.styles?.polyline || {}) },
+                polygon: { ...this.defaultStyles.polygon, ...(options.styles?.polygon || {}) }
+            }
+        };
     }
 
     /**
@@ -122,7 +162,7 @@ class DrawTool {
      * 鼠标事件之绘制线的右击事件
      * @private
      */
-    _rightClickEventForPolyline() {
+    _rightClickEventForPolyline(callback) {
         this._drawHandler.setInputAction((e) => {
             let p = this.viewer.scene.pickPosition(e.position);
             if (!p) return;
@@ -131,15 +171,9 @@ class DrawTool {
             this._dataSource.entities.add({
                 polyline: {
                     positions: this._tempPositions,
-                    clampToGround: true, //贴地
-                    width: 3,
-                    material: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                    depthFailMaterial: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                },
+                    clampToGround: true,
+                    ...this.options.styles.polyline
+                }
             });
         }, ScreenSpaceEventType.RIGHT_CLICK);
     }
@@ -156,17 +190,10 @@ class DrawTool {
             const polylineEntity = this._dataSource.entities.add({
                 polyline: {
                     positions: this._tempPositions,
-                    clampToGround: true, //贴地
-                    width: 3,
-                    material: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                    depthFailMaterial: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                },
+                    clampToGround: true,
+                    ...this.options.styles.polyline
+                }
             });
-            // 调用回调函数，传递绘制完成的实体
             if (callback && typeof callback === 'function') {
                 callback(polylineEntity);
             }
@@ -207,7 +234,6 @@ class DrawTool {
             let p = this.viewer.scene.pickPosition(e.position);
             if (!p) return;
             
-            // 检查点数是否足够
             if (this._tempPositions.length < 3) {
                 alert('请至少绘制3个点来构成一个面');
                 return;
@@ -219,23 +245,16 @@ class DrawTool {
             const polygonEntity = this._dataSource.entities.add({
                 polyline: {
                     positions: this._tempPositions,
-                    clampToGround: true, //贴地
-                    width: 3,
-                    material: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                    depthFailMaterial: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
+                    clampToGround: true,
+                    ...this.options.styles.polygon
                 },
                 polygon: {
                     hierarchy: this._tempPositions,
                     extrudedHeightReference: HeightReference.CLAMP_TO_GROUND,
-                    material: Color.RED.withAlpha(0.4),
-                    clampToGround: true,
-                },
+                    material: this.options.styles.polygon.fillColor,
+                    clampToGround: true
+                }
             });
-            // 调用回调函数，传递绘制完成的实体或其他相关数据
             if (callback && typeof callback === 'function') {
                 callback(polygonEntity);
             }
@@ -251,7 +270,6 @@ class DrawTool {
             let p = this.viewer.scene.pickPosition(e.position);
             if (!p) return;
             
-            // 检查点数是否足够
             if (this._tempPositions.length < 3) {
                 alert('请至少绘制3个点来构成一个面');
                 return;
@@ -263,23 +281,16 @@ class DrawTool {
             const polygonEntity = this._dataSource.entities.add({
                 polyline: {
                     positions: this._tempPositions,
-                    clampToGround: true, //贴地
-                    width: 3,
-                    material: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                    depthFailMaterial: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
+                    clampToGround: true,
+                    ...this.options.styles.polygon
                 },
                 polygon: {
                     hierarchy: this._tempPositions,
                     extrudedHeightReference: HeightReference.CLAMP_TO_GROUND,
-                    material: Color.RED.withAlpha(0.4),
-                    clampToGround: true,
-                },
+                    material: this.options.styles.polygon.fillColor,
+                    clampToGround: true
+                }
             });
-            // 调用回调函数，传递绘制完成的实体或其他相关数据
             if (callback && typeof callback === 'function') {
                 callback(polygonEntity);
             }
@@ -346,13 +357,7 @@ class DrawTool {
     _addPoint(p) {
         this._dataSource.entities.add({
             position: Cartesian3.fromDegrees(p[0], p[1], p[2]),
-            point: {
-                color: Color.RED,
-                pixelSize: 10,
-                outlineColor: Color.YELLOW,
-                outlineWidth: 2,
-                // heightReference:Cesium.HeightReference.CLAMP_TO_GROUND
-            },
+            point: this.options.styles.point
         });
     }
 
@@ -370,15 +375,9 @@ class DrawTool {
                     }
                     return c;
                 }, false),
-                clampToGround: true, //贴地
-                width: 3,
-                material: new PolylineDashMaterialProperty({
-                    color: Color.YELLOW,
-                }),
-                depthFailMaterial: new PolylineDashMaterialProperty({
-                    color: Color.YELLOW,
-                }),
-            },
+                clampToGround: true,
+                ...this.options.styles.polyline
+            }
         });
     }
 
@@ -398,15 +397,9 @@ class DrawTool {
                         }
                         return c;
                     }, false),
-                    clampToGround: true, //贴地
-                    width: 3,
-                    material: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                    depthFailMaterial: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                },
+                    clampToGround: true,
+                    ...this.options.styles.polygon
+                }
             });
         } else {
             this._dataSource.entities.removeAll();
@@ -421,8 +414,8 @@ class DrawTool {
                         return new PolygonHierarchy(poss);
                     }, false),
                     extrudedHeightReference: HeightReference.CLAMP_TO_GROUND,
-                    material: Color.RED.withAlpha(0.4),
-                    clampToGround: true,
+                    material: this.options.styles.polygon.fillColor,
+                    clampToGround: true
                 },
                 polyline: {
                     positions: new CallbackProperty(() => {
@@ -433,15 +426,9 @@ class DrawTool {
                         }
                         return c;
                     }, false),
-                    clampToGround: true, //贴地
-                    width: 3,
-                    material: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                    depthFailMaterial: new PolylineDashMaterialProperty({
-                        color: Color.YELLOW,
-                    }),
-                },
+                    clampToGround: true,
+                    ...this.options.styles.polygon
+                }
             });
         }
     }
