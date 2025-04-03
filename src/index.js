@@ -4,13 +4,14 @@ import BasemapControl from './basemap/basemapControl';
 import FullscreenControl from './controls/fullscreenControl';
 import ZoomControl from './controls/zoomControl';
 import ScaleControl from './controls/scaleControl';
+import EntityManager from './entity/entityManager';
 import './css/main.css';
 import './css/control.css';
 import config from './core/config';
-import { Ion } from 'cesium';   
+import * as Cesium from 'cesium';
 export default class CesiumLite {
     constructor(containerId, options={}) {
-        Ion.defaultAccessToken = config.token;
+        Cesium.Ion.defaultAccessToken = config.token;
         // 默认配置
         const defaultOptions = {
             containerId: containerId,
@@ -53,7 +54,6 @@ export default class CesiumLite {
                 }
             }
         };
-
         // 合并用户配置和默认配置
         this.options = this.deepMerge(defaultOptions, options);
         // 初始化地图核心模块
@@ -69,6 +69,9 @@ export default class CesiumLite {
         this.zoomControl = new ZoomControl(this.mapCore.viewer, this.options.map.controls);
         // 初始化比例尺控件模块
         this.scaleControl = new ScaleControl(this.mapCore.viewer, this.options.map.controls);
+        // 初始化实体管理模块
+        this.entityManager = new EntityManager(this.mapCore.viewer);
+
         if(this.options.map.controls.fullscreen) {
             this.fullscreenControl.show();
             this.fullscreenControl.setPosition('top-right');
@@ -89,6 +92,7 @@ export default class CesiumLite {
         }
         // 暴露实例到全局
         window.cesiumInstance = this;
+        window.Cesium = Cesium;
     }
 
     /**

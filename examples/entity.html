@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create-Cesium 🌏</title>
+    <script type="module" src="/src/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <style>
+      #cesiumContainer {
+        width: 100%;
+        height: 100vh;
+      }
+      #addCubeButton {
+        position: absolute;
+        top: 10px;
+        left: 200px;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <button id="addCubeButton">添加正方体</button>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const cesiumLite = new CesiumLite('cesiumContainer', {
+          map: {
+            baseMap: {
+              id: 'imagery'
+            },
+            camera: {
+              longitude: 116.397428,
+              latitude: 39.90923,
+              height: 1000000,
+              heading: 0,
+              pitch: -90,
+              roll: 0
+            }
+          }
+        });
+
+        const addCubeButton = document.getElementById('addCubeButton'); // 创建按钮
+
+        addCubeButton.addEventListener('click', () => { // 为按钮添加点击事件
+            const entityId = cesiumLite.entityManager.addEntity({ // 调用实体管理器添加正方体
+                position: Cesium.Cartesian3.fromDegrees(116.397428, 39.90923, 100000), // 设置正方体位置
+                box: { // 设置正方体的属性
+                    dimensions: new Cesium.Cartesian3(100000.0, 100000.0, 100000.0), // 正方体的尺寸
+                    material: Cesium.Color.RED.withAlpha(0.5) // 设置正方体颜色和透明度
+                }
+            });
+        });
+      });
+    </script>
+  </body>
+</html>
