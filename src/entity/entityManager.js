@@ -11,10 +11,13 @@ class EntityManager {
     }
 
     // 添加实体
-    addEntity(options) {
+    addEntity(options,isLocate = false) {
         const entityWrapper = new EntityWrapper(options);
         this.entities.set(entityWrapper.id, entityWrapper);
         this.dataSource.entities.add(entityWrapper.getEntity());
+        if (isLocate) {
+            this.locateEntity(entityWrapper.id);
+        }
         return entityWrapper.id;
     }
 
@@ -35,6 +38,13 @@ class EntityManager {
         }
     }
 
+    //视角实体定位
+    locateEntity(entityId) {
+        if (this.entities.has(entityId)) {
+            const entityWrapper = this.entities.get(entityId);
+            this.viewer.zoomTo(entityWrapper.getEntity());
+        }
+    }
     // 获取所有实体
     getAllEntities() {
         return Array.from(this.entities.values()).map(wrapper => wrapper.getEntity());

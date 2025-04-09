@@ -12,17 +12,98 @@
         width: 100%;
         height: 100vh;
       }
-      #addCubeButton {
+      .control-panel {
         position: absolute;
-        top: 10px;
-        left: 200px;
+        top: 20px;
+        left: 80px;
         z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 300px;
+      }
+      .control-panel h3 {
+        margin: 0 0 15px 0;
+        color: #333;
+        font-size: 16px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .button-group {
+        margin-bottom: 15px;
+      }
+      .button-group:last-child {
+        margin-bottom: 0;
+      }
+      .button-group h4 {
+        margin: 0 0 10px 0;
+        color: #666;
+        font-size: 14px;
+      }
+      button {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      button:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
+      }
+      button:active {
+        background: #e9e9e9;
+      }
+      button:last-child {
+        margin-bottom: 0;
+      }
+      #removeAll {
+        background: #ff4d4f;
+        color: white;
+        border: none;
+      }
+      #removeAll:hover {
+        background: #ff7875;
       }
     </style>
   </head>
   <body>
     <div id="cesiumContainer"></div>
-    <button id="addCubeButton">添加正方体</button>
+    <div class="control-panel">
+      <h3>实体控制面板</h3>
+      
+      <div class="button-group">
+        <h4>基本图形</h4>
+        <button id="addPolygon">添加多边形面</button>
+        <button id="addBox">添加盒子模型</button>
+        <button id="addRectangle">添加矩形</button>
+        <button id="addSpheres">添加球体</button>
+        <button id="addEllipseGraphics">添加椭圆形</button>
+        <button id="addCylinderGraphics">添加圆柱</button>
+        <button id="addPolylineGraphics">添加线段</button>
+      </div>
+
+      <div class="button-group">
+        <h4>高级图形</h4>
+        <button id="addPolylineVolumesRounded">线段体积(圆形)</button>
+        <button id="addPolylineVolumesMitered">线段体积(直角)</button>
+        <button id="addPolylineVolumesBeveled">线段体积(切角)</button>
+        <button id="addCorridorGraphics">添加走廊</button>
+        <button id="addWall">添加墙</button>
+      </div>
+
+      <div class="button-group">
+        <h4>操作</h4>
+        <button id="removeAll">清除所有实体</button>
+      </div>
+    </div>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const cesiumLite = new CesiumLite('cesiumContainer', {
@@ -41,16 +122,205 @@
           }
         });
 
-        const addCubeButton = document.getElementById('addCubeButton'); // 创建按钮
+        // 添加多边形面
+        document.getElementById('addPolygon').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            polygon: {
+              hierarchy: Cesium.Cartesian3.fromDegreesArray([
+                -109.080842, 45.002073, -104.058488, 45.002073,
+                -104.053011, 41.003906, -105.728954, 41.003906,
+              ]),
+              height: 5000,
+              material: Cesium.Color.BLUE.withAlpha(0.5),
+              outline: true,
+              outlineColor: Cesium.Color.BLACK,
+            }
+          }, true);
+        });
 
-        addCubeButton.addEventListener('click', () => { // 为按钮添加点击事件
-            const entityId = cesiumLite.entityManager.addEntity({ // 调用实体管理器添加正方体
-                position: Cesium.Cartesian3.fromDegrees(116.397428, 39.90923, 100000), // 设置正方体位置
-                box: { // 设置正方体的属性
-                    dimensions: new Cesium.Cartesian3(100000.0, 100000.0, 100000.0), // 正方体的尺寸
-                    material: Cesium.Color.RED.withAlpha(0.5) // 设置正方体颜色和透明度
-                }
-            });
+        // 添加盒子模型
+        document.getElementById('addBox').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            position: Cesium.Cartesian3.fromDegrees(-109.080842, 45.002073),
+            box: {
+              heightReference: 1,
+              dimensions: new Cesium.Cartesian3(5000, 5000, 5000),
+              material: Cesium.Color.RED.withAlpha(0.5),
+              show: true
+            }
+          }, true);
+        });
+
+        // 添加椭圆形
+        document.getElementById('addEllipseGraphics').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            position: Cesium.Cartesian3.fromDegrees(-105.91517, 45.002073),
+            ellipse: {
+              heightReference: 'NONE',
+              extrudedHeight: 5000,
+              semiMinorAxis: 3000,
+              semiMajorAxis: 5000,
+              material: Cesium.Color.RED.withAlpha(0.5)
+            }
+          }, true);
+        });
+
+        // 添加走廊
+        document.getElementById('addCorridorGraphics').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            corridor: {
+              extrudedHeight: 10000,
+              height: 1000,
+              width: 5000,
+              material: Cesium.Color.RED.withAlpha(0.5),
+              positions: Cesium.Cartesian3.fromDegreesArray([
+                -109.080842, 45.002073, -105.91517, 45.002073, -104.058488, 44.996596,
+                -104.053011, 43.002989, -104.053011, 41.003906, -105.728954, 40.998429,
+              ])
+            }
+          }, true);
+        });
+
+        // 添加圆柱
+        document.getElementById('addCylinderGraphics').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            position: Cesium.Cartesian3.fromDegrees(-104.058488, 44.996596),
+            cylinder: {
+              length: 5000,
+              topRadius: 500,
+              bottomRadius: 500,
+              material: Cesium.Color.RED.withAlpha(0.5),
+              outline: true,
+              numberOfVerticalLines: 20
+            }
+          }, true);
+        });
+
+        // 添加线段
+        document.getElementById('addPolylineGraphics').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            polyline: {
+              positions: Cesium.Cartesian3.fromDegreesArray([
+                -109.080842, 45.002073, -105.91517, 45.002073, -104.058488, 44.996596,
+                -104.053011, 43.002989, -104.053011, 41.003906, -105.728954, 40.998429,
+                -107.919731, 41.003906, -109.04798, 40.998429, -111.047063, 40.998429,
+                -111.047063, 42.000709, -111.047063, 44.476286, -111.05254, 45.002073,
+              ]),
+              width: 10,
+              material: new Cesium.PolylineDashMaterialProperty({
+                color: Cesium.Color.CYAN
+              })
+            }
+          }, true);
+        });
+
+        // 添加线段体积(圆形)
+        document.getElementById('addPolylineVolumesRounded').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            name: "Red tube with rounded corners",
+            polylineVolume: {
+              positions: Cesium.Cartesian3.fromDegreesArray([
+                -85.0, 32.0, -85.0, 36.0, -89.0, 36.0, -87.84, 42.49
+              ]),
+              shape: computeCircle(60000.0),
+              material: Cesium.Color.ORANGE,
+              cornerType: Cesium.CornerType.ROUNDED
+            }
+          }, true);
+        });
+
+        // 添加线段体积(直角)
+        document.getElementById('addPolylineVolumesMitered').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            name: "Red tube with mitered corners",
+            polylineVolume: {
+              positions: Cesium.Cartesian3.fromDegreesArray([
+                -83.0, 32.0, -83.0, 36.0, -87.0, 36.0, -85.84, 42.49
+              ]),
+              shape: computeCircle(60000.0),
+              material: Cesium.Color.ORANGE,
+              cornerType: Cesium.CornerType.MITERED
+            }
+          }, true);
+        });
+
+        // 添加线段体积(切角)
+        document.getElementById('addPolylineVolumesBeveled').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            name: "Red tube with beveled corners",
+            polylineVolume: {
+              positions: Cesium.Cartesian3.fromDegreesArray([
+                -81.0, 32.0, -81.0, 36.0, -85.0, 36.0, -83.84, 42.49
+              ]),
+              shape: computeCircle(60000.0),
+              material: Cesium.Color.ORANGE,
+              cornerType: Cesium.CornerType.BEVELED
+            }
+          }, true);
+        });
+
+        // 添加矩形
+        document.getElementById('addRectangle').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            rectangle: {
+              coordinates: Cesium.Rectangle.fromDegrees(-110.0, 20.0, -80.0, 25.0),
+              extrudedHeight: 300000.0,
+              height: 100000.0,
+              material: Cesium.Color.RED.withAlpha(0.5),
+              outline: true,
+              outlineColor: Cesium.Color.BLACK
+            }
+          }, true);
+        });
+
+        // 添加球体
+        document.getElementById('addSpheres').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            name: "Spheres",
+            position: Cesium.Cartesian3.fromDegrees(-114.0, 40.0, 300000.0),
+            ellipsoid: {
+              radii: new Cesium.Cartesian3(200000.0, 200000.0, 300000.0),
+              innerRadii: new Cesium.Cartesian3(150000.0, 150000.0, 200000.0),
+              material: Cesium.Color.RED.withAlpha(0.5),
+              outline: true
+            }
+          }, true);
+        });
+
+        // 添加墙
+        document.getElementById('addWall').addEventListener('click', () => {
+          cesiumLite.entityManager.addEntity({
+            name: "Green wall from surface with outline",
+            wall: {
+              positions: Cesium.Cartesian3.fromDegreesArrayHeights([
+                -107.0, 43.0, 100000.0,
+                -97.0, 43.0, 100000.0,
+                -97.0, 40.0, 100000.0,
+                -107.0, 40.0, 100000.0,
+                -107.0, 43.0, 100000.0
+              ]),
+              material: Cesium.Color.RED.withAlpha(0.5),
+              outline: true
+            }
+          }, true);
+        });
+
+        // 计算圆形路径
+        function computeCircle(radius) {
+          const positions = [];
+          for (let i = 0; i < 360; i++) {
+            const radians = Cesium.Math.toRadians(i);
+            positions.push(
+              new Cesium.Cartesian2(
+                radius * Math.cos(radians),
+                radius * Math.sin(radians)
+              )
+            );
+          }
+          return positions;
+        }
+        document.getElementById('removeAll').addEventListener('click', () => {
+          cesiumLite.entityManager.clearEntities();
         });
       });
     </script>
