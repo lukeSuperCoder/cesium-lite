@@ -7,36 +7,174 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>导航页面 🌏</title>
+    <title>CesiumLite-开启你的三维之旅 🌏</title>
     
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
+      * {
         margin: 0;
-        padding: 20px;
+        padding: 0;
+        box-sizing: border-box;
       }
+      
+      body {
+        font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
       h1 {
-        color: #333;
+        color: #2c3e50;
         text-align: center;
+        font-size: 2.5em;
+        margin-bottom: 40px;
+        position: relative;
       }
-      ol {
+
+      h1::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: #3498db;
+        margin: 10px auto;
+        border-radius: 2px;
+      }
+
+      .nav-list {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
         padding: 0;
       }
-      li {
-        margin: 10px 0;
+
+      .nav-item {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .nav-link {
+        text-decoration: none;
+        color: #2c3e50;
+        font-size: 1.2em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        transition: color 0.3s ease;
+      }
+
+      .nav-link:hover {
+        color: #3498db;
+      }
+
+      .nav-link::before {
+        content: '🌏';
+        margin-right: 10px;
+        font-size: 1.2em;
+      }
+
+      .description {
         text-align: center;
+        color: #666;
+        margin-top: 30px;
+        font-size: 0.9em;
+      }
+
+      .coming-soon {
+        margin-top: 40px;
+        text-align: center;
+        color: #666;
+        position: relative;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .coming-soon h2 {
+        color: #2c3e50;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+      }
+
+      .coming-soon p {
+        font-size: 1.1em;
+        line-height: 1.6;
+      }
+
+      .coming-soon::before {
+        content: '✨';
+        font-size: 2em;
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      .coming-soon::after {
+        content: '';
+        display: block;
+        width: 100px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #3498db, transparent);
+        margin: 20px auto 0;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 20px;
+        }
+        
+        h1 {
+          font-size: 2em;
+        }
+        
+        .nav-list {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
     <script type="module" crossorigin src="/assets/index.c08e3d43.js"></script>
     <link rel="stylesheet" href="/assets/index.d8037457.css">
   </head>
   <body>
-    <h1>示例导航</h1>
-    <ol>
-      <li><a href="examples/basicMap.html" target="_blank">创建地图</a></li>
-      <li><a href="examples/entity.html" target="_blank">创建实体</a></li>
-      <!-- 可以在这里添加更多示例链接 -->
-    </ol>
+    <div class="container">
+      <h1>CesiumLite-开启你的三维之旅 🌏</h1>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="examples/basicMap.html" target="_blank" class="nav-link">创建地图</a>
+        </li>
+        <li class="nav-item">
+          <a href="examples/entity.html" target="_blank" class="nav-link">创建实体</a>
+        </li>
+        <!-- 可以在这里添加更多示例链接 -->
+      </ul>
+      <p class="description">点击上面的链接查看不同的 Cesium 示例</p>
+      
+      <div class="coming-soon">
+        <h2>未完待续</h2>
+        <p>更多精彩示例正在开发中，敬请期待！</p>
+      </div>
+    </div>
   </body>
 </html>
