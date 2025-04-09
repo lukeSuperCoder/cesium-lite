@@ -3,6 +3,6 @@ import cesium from "vite-plugin-cesium";
 export default defineConfig({
   plugins: [cesium()],
   server: {
-    port: 5173,
+    port: 8020,
   }
 });
