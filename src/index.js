@@ -7,6 +7,8 @@ import ScaleControl from './controls/scaleControl';
 import DrawTool from './mark/draw';
 import MeasureTool from './mark/measure';
 import EntityManager from './entity/entityManager';
+import Marker from './markers/marker';
+import ClusterMarker from './markers/clusterMarker';
 import './css/main.css';
 import './css/control.css';
 import config from './core/config';
@@ -76,9 +78,13 @@ export default class CesiumLite {
         this.drawTool = new DrawTool(this.mapCore.viewer, {styles: this.options.map.drawStyles});
         // 初始化测量工具
         this.measureTool = new MeasureTool(this.mapCore.viewer);
-        
         // 初始化实体管理模块
         this.entityManager = new EntityManager(this.mapCore.viewer);
+        // 初始化标记点管理模块
+        this.marker = new Marker(this.mapCore.viewer);
+        // 初始化聚合点管理模块
+        this.clusterMarker = new ClusterMarker(this.mapCore.viewer);
+
 
         if(this.options.map.controls.fullscreen) {
             this.fullscreenControl.show();

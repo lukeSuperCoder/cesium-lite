@@ -8,16 +8,17 @@ import {
     createGuid,
     NearFarScalar,
     VerticalOrigin,
-    HorizontalOrigin
+    HorizontalOrigin,
+    EntityCluster
 } from "cesium";
 
 /**
- * 标记点管理类
+ * 聚合标记点管理类
  * 支持添加、删除、清空标记点
  * 支持自定义样式和图标
- * 仅支持通过数据添加标记点
+ * 支持标记点聚合功能
  */
-class MarkerTool {
+class ClusterMarker {
     /**
      * 构造函数
      * @param {Object} viewer Cesium viewer实例
@@ -26,7 +27,7 @@ class MarkerTool {
     constructor(viewer, options = {}) {
         if (!viewer) throw new Error('Viewer instance is required');
         this.viewer = viewer;
-        this._dataSource = new CustomDataSource("markerDataSource");
+        this._dataSource = new CustomDataSource("clusterMarkerDataSource");
         this.viewer.dataSources.add(this._dataSource);
         this._markers = new Map(); // 存储所有标记点
         
@@ -56,6 +57,14 @@ class MarkerTool {
                 verticalOrigin: VerticalOrigin.BOTTOM,
                 horizontalOrigin: HorizontalOrigin.CENTER,
                 pixelOffset: {x: 0, y: -10}
+            },
+            cluster: {
+                enabled: true,
+                pixelRange: 80,         // 聚合像素范围
+                minimumClusterSize: 2,  // 最小聚合数量
+                clusterBillboards: true,
+                clusterLabels: true,
+                clusterPoints: true
             }
         };
         
@@ -64,9 +73,71 @@ class MarkerTool {
             styles: {
                 point: { ...this.defaultStyles.point, ...(options.styles?.point || {}) },
                 billboard: { ...this.defaultStyles.billboard, ...(options.styles?.billboard || {}) },
-                label: { ...this.defaultStyles.label, ...(options.styles?.label || {}) }
+                label: { ...this.defaultStyles.label, ...(options.styles?.label || {}) },
+                cluster: { ...this.defaultStyles.cluster, ...(options.styles?.cluster || {}) }
             }
         };
+        
+        // 初始化聚合设置
+        this._initCluster();
+    }
+    
+    /**
+     * 初始化聚合设置
+     * @private
+     */
+    _initCluster() {
+        const clusterOptions = this.options.styles.cluster;
+        const entityCluster = this._dataSource.clustering;
+        
+        // 设置聚合参数
+        entityCluster.enabled = clusterOptions.enabled;
+        entityCluster.pixelRange = clusterOptions.pixelRange;
+        entityCluster.minimumClusterSize = clusterOptions.minimumClusterSize;
+        entityCluster.clusterBillboards = clusterOptions.clusterBillboards;
+        entityCluster.clusterLabels = clusterOptions.clusterLabels;
+        entityCluster.clusterPoints = clusterOptions.clusterPoints;
+        
+        // 自定义聚合样式
+        entityCluster.clusterEvent.addEventListener((clusteredEntities, cluster) => {
+            // 获取聚合中的实体数量
+            const count = clusteredEntities.length;
+            
+            
+            // 设置聚合点的样式
+            cluster.label.show = true;
+            cluster.label.text = count.toString();
+            cluster.label.fillColor = Color.WHITE;
+            cluster.label.outlineColor = Color.BLACK;
+            cluster.label.outlineWidth = 2;
+            cluster.label.style = 'FILL_AND_OUTLINE';
+            cluster.label.font = '18px sans-serif';
+            cluster.label.pixelOffset = {x: 0, y: -30};
+            
+            // 根据聚合数量设置不同大小和颜色
+            let color, pixelSize;
+            if (count >= 50) {
+                color = Color.RED;
+                pixelSize = 28;
+            } else if (count >= 20) {
+                color = Color.ORANGE;
+                pixelSize = 24;
+            } else if (count >= 10) {
+                color = Color.YELLOW;
+                pixelSize = 20;
+            } else {
+                color = Color.BLUE;
+                pixelSize = 16;
+            }
+            
+            // 设置聚合点的外观
+            cluster.billboard.show = false; // 隐藏默认图标
+            cluster.point.show = true;
+            cluster.point.color = color;
+            cluster.point.pixelSize = pixelSize;
+            cluster.point.outlineColor = Color.WHITE;
+            cluster.point.outlineWidth = 2;
+        });
     }
 
     /**
@@ -129,8 +200,6 @@ class MarkerTool {
         
         return id;
     }
-    
-
     
     /**
      * 根据ID获取标记点
@@ -255,6 +324,44 @@ class MarkerTool {
         
         return addedIds;
     }
+    
+    /**
+     * 设置聚合参数
+     * @param {Object} options 聚合参数选项
+     */
+    setClusterOptions(options = {}) {
+        const entityCluster = this._dataSource.clustering;
+        
+        // 更新聚合参数
+        if (options.enabled !== undefined) entityCluster.enabled = options.enabled;
+        if (options.pixelRange !== undefined) entityCluster.pixelRange = options.pixelRange;
+        if (options.minimumClusterSize !== undefined) entityCluster.minimumClusterSize = options.minimumClusterSize;
+        if (options.clusterBillboards !== undefined) entityCluster.clusterBillboards = options.clusterBillboards;
+        if (options.clusterLabels !== undefined) entityCluster.clusterLabels = options.clusterLabels;
+        if (options.clusterPoints !== undefined) entityCluster.clusterPoints = options.clusterPoints;
+        
+        // 更新内部配置
+        this.options.styles.cluster = {
+            ...this.options.styles.cluster,
+            ...options
+        };
+    }
+    
+    /**
+     * 启用聚合功能
+     */
+    enableClustering() {
+        this._dataSource.clustering.enabled = true;
+        this.options.styles.cluster.enabled = true;
+    }
+    
+    /**
+     * 禁用聚合功能
+     */
+    disableClustering() {
+        this._dataSource.clustering.enabled = false;
+        this.options.styles.cluster.enabled = false;
+    }
 }
 
-export default MarkerTool;
+export default ClusterMarker;
