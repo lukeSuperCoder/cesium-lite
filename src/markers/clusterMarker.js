@@ -100,44 +100,149 @@ class ClusterMarker {
         
         // 自定义聚合样式
         entityCluster.clusterEvent.addEventListener((clusteredEntities, cluster) => {
-            // 获取聚合中的实体数量
             const count = clusteredEntities.length;
             
-            
-            // 设置聚合点的样式
-            cluster.label.show = true;
-            cluster.label.text = count.toString();
-            cluster.label.fillColor = Color.WHITE;
-            cluster.label.outlineColor = Color.BLACK;
-            cluster.label.outlineWidth = 2;
-            cluster.label.style = 'FILL_AND_OUTLINE';
-            cluster.label.font = '18px sans-serif';
-            cluster.label.pixelOffset = {x: 0, y: -30};
-            
-            // 根据聚合数量设置不同大小和颜色
-            let color, pixelSize;
+            // 根据数量设置不同大小和颜色
+            let bgColor, size;
             if (count >= 50) {
-                color = Color.RED;
-                pixelSize = 28;
+                bgColor = "#D32F2F"; // 更深红色
+                size = 36;
             } else if (count >= 20) {
-                color = Color.ORANGE;
-                pixelSize = 24;
+                bgColor = "#E64A19"; // 更深橙色
+                size = 32;
             } else if (count >= 10) {
-                color = Color.YELLOW;
-                pixelSize = 20;
+                bgColor = "#7B1FA2"; // 紫色，替换不易看清文字的黄色
+                size = 28;
             } else {
-                color = Color.BLUE;
-                pixelSize = 16;
+                bgColor = "#1976D2"; // 更深蓝色
+                size = 24;
             }
             
-            // 设置聚合点的外观
-            cluster.billboard.show = false; // 隐藏默认图标
-            cluster.point.show = true;
-            cluster.point.color = color;
-            cluster.point.pixelSize = pixelSize;
-            cluster.point.outlineColor = Color.WHITE;
-            cluster.point.outlineWidth = 2;
+            // 隐藏默认的点和标签
+            cluster.point.show = false;
+            cluster.label.show = false;
+            
+            // 使用自定义billboard来代替（一个图像包含圆形背景和文字）
+            cluster.billboard.show = true;
+            cluster.billboard.image = createClusterImage(count, bgColor, size);
+            cluster.billboard.width = size * 2.5;
+            cluster.billboard.height = size * 2.5;
+            cluster.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+            cluster.billboard.verticalOrigin = VerticalOrigin.CENTER;
+            cluster.billboard.horizontalOrigin = HorizontalOrigin.CENTER;
+            cluster.billboard.scaleByDistance = new NearFarScalar(1.0e2, 1.0, 2.0e5, 0.6);  // 远处缩放比例提高
         });
+        
+        /**
+         * 创建聚合点图像
+         * @param {Number} count 聚合点数量
+         * @param {String} backgroundColor 背景颜色
+         * @param {Number} size 圆形大小
+         * @returns {HTMLCanvasElement} 生成的图像
+         * @private
+         */
+        function createClusterImage(count, backgroundColor, size) {
+            // 获取设备像素比以支持高DPI显示
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            // 设置画布大小为圆形大小的2.6倍（考虑到边框和阴影）
+            const diameter = size * 2.6;
+            
+            // 使用设备像素比调整画布尺寸，提高清晰度
+            const scaledDiameter = diameter * devicePixelRatio;
+            canvas.width = scaledDiameter;
+            canvas.height = scaledDiameter;
+            canvas.style.width = `${diameter}px`;
+            canvas.style.height = `${diameter}px`;
+            
+            // 根据设备像素比缩放上下文
+            context.scale(devicePixelRatio, devicePixelRatio);
+            
+            const centerX = diameter / 2;
+            const centerY = diameter / 2;
+            const radius = size;
+            
+            // 开启抗锯齿
+            context.imageSmoothingEnabled = true;
+            context.imageSmoothingQuality = 'high';
+            
+            // 绘制阴影
+            context.shadowColor = 'rgba(0, 0, 0, 0.6)';
+            context.shadowBlur = 8;
+            context.shadowOffsetX = 0;
+            context.shadowOffsetY = 3;
+            
+            // 绘制圆形背景 - 使用径向渐变使圆形看起来更立体
+            const gradient = context.createRadialGradient(
+                centerX, centerY - radius/3, radius/10,
+                centerX, centerY, radius
+            );
+            gradient.addColorStop(0, lightenColor(backgroundColor, 15));
+            gradient.addColorStop(1, backgroundColor);
+            
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
+            context.fillStyle = gradient;
+            context.fill();
+            
+            // 绘制边框
+            context.shadowColor = 'transparent'; // 关闭边框阴影
+            context.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            context.lineWidth = 2.5;
+            context.stroke();
+            
+            // 设置文本样式 - 放大字体
+            const fontSize = Math.max(12, Math.floor(size * 0.8));
+            context.fillStyle = '#FFFFFF'; // 统一使用白色文字
+            context.font = `bold ${fontSize}px Arial, sans-serif`;
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            
+            // 文字阴影效果，增强可读性
+            context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+            context.shadowBlur = 4;
+            context.shadowOffsetX = 0;
+            context.shadowOffsetY = 1;
+            
+            // 使用特殊技术提高文字锐利度
+            context.textRendering = 'geometricPrecision';
+            
+            // 绘制文本
+            context.fillText(count.toString(), centerX, centerY);
+            
+            return canvas;
+        }
+        
+        /**
+         * 使颜色变亮
+         * @param {String} color 16进制颜色值
+         * @param {Number} percent 变亮百分比
+         * @returns {String} 变亮后的颜色
+         */
+        function lightenColor(color, percent) {
+            // 移除#号
+            let hex = color.replace('#', '');
+            
+            // 转换为RGB
+            let r = parseInt(hex.substring(0, 2), 16);
+            let g = parseInt(hex.substring(2, 4), 16);
+            let b = parseInt(hex.substring(4, 6), 16);
+            
+            // 增加亮度
+            r = Math.min(255, Math.round(r * (100 + percent) / 100));
+            g = Math.min(255, Math.round(g * (100 + percent) / 100));
+            b = Math.min(255, Math.round(b * (100 + percent) / 100));
+            
+            // 转回16进制
+            r = r.toString(16).padStart(2, '0');
+            g = g.toString(16).padStart(2, '0');
+            b = b.toString(16).padStart(2, '0');
+            
+            return `#${r}${g}${b}`;
+        }
     }
 
     /**
