@@ -111,7 +111,7 @@ class ClusterMarker {
                 bgColor = "#E64A19"; // 更深橙色
                 size = 32;
             } else if (count >= 10) {
-                bgColor = "#7B1FA2"; // 紫色，替换不易看清文字的黄色
+                bgColor = "#7B1FA2"; // 紫色
                 size = 28;
             } else {
                 bgColor = "#1976D2"; // 更深蓝色
