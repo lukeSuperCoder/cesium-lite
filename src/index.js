@@ -9,6 +9,7 @@ import MeasureTool from './mark/measure';
 import EntityManager from './entity/entityManager';
 import Marker from './markers/marker';
 import ClusterMarker from './markers/clusterMarker';
+import SpatialAnalysis from './utils/spatialAnalysis';
 import './css/main.css';
 import './css/control.css';
 import config from './core/config';
@@ -84,6 +85,8 @@ export default class CesiumLite {
         this.marker = new Marker(this.mapCore.viewer);
         // 初始化聚合点管理模块
         this.clusterMarker = new ClusterMarker(this.mapCore.viewer);
+        // 初始化空间分析模块
+        this.spatialAnalysis = new SpatialAnalysis(this.mapCore.viewer);
 
 
         if(this.options.map.controls.fullscreen) {
