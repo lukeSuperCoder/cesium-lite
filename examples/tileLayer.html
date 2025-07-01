@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cesium 瓦片图层示例</title>
+    <script type="module" src="/src/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <style>
+      #cesiumContainer {
+        width: 100%;
+        height: 100vh;
+      }
+      .dg.main {
+        position: absolute;
+        top: 10px;
+        right: 100px;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script type="module">
+      // 假设CesiumLite已全局可用
+      document.addEventListener('DOMContentLoaded', async () => {
+        const cesiumLite = new CesiumLite('cesiumContainer', {
+          map: {
+            baseMap: {
+              id: 'imagery'
+            },
+            camera: {
+              longitude: 116.397428,
+              latitude: 39.90923,
+              height: 1000000,
+              heading: 0,
+              pitch: -90,
+              roll: 0
+            }
+          }
+        });
+
+        // 创建图层管理工具
+        const vectorTileLayer = cesiumLite.vectorTileLayer;
+
+        // 示例图层配置
+        const layersConfig = {
+          wms: {
+            type: 'wms',
+            url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
+            options: {
+              layers: 'nexrad-n0r',
+              credit: "demo",
+              parameters: {
+                transparent: true,
+                format: 'image/png'
+              }
+            }
+          },
+          wmts: {
+            type: 'wmts',
+            url: 'https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml',
+            options: {
+              layer: 's2cloudless-2021',
+              style: 'default',
+              tileMatrixSetID: 'WGS84',
+              format: 'image/png'
+            }
+          },
+          xyz: {
+            type: 'xyz',
+            url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            options: { alpha: 0.8 }
+          },
+          tms: {
+            type: 'tms',
+            url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2022-01-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
+            options: { alpha: 0.7 }
+          },
+          singleTile: {
+            type: 'singleTile',
+            url: 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Map_of_the_world_by_the_US_Government_CIA_World_Factbook.png',
+            options: {
+              rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+              alpha: 0.6
+            }
+          },
+          ion: {
+            type: 'ion',
+            options: {
+              assetId: 3954, // 示例影像id
+              alpha: 1.0
+            }
+          },
+          wfs: {
+            type: 'wfs',
+            url: 'https://ahocevar.com/geoserver/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=application/json',
+            options: {
+              stroke: 'yellow',
+              fill: 'yellow',
+              strokeWidth: 2
+            }
+          }
+        };
+
+        // 当前图层ID
+        let currentLayerId = null;
+        let currentLayerType = null;
+
+        // dat.GUI 控件
+        const gui = new dat.GUI();
+        const layerFolder = gui.addFolder('图层切换');
+        layerFolder.open();
+        const layerParams = {
+          wms: async () => switchLayer('wms'),
+          wmts: async () => switchLayer('wmts'),
+          xyz: async () => switchLayer('xyz'),
+          tms: async () => switchLayer('tms'),
+          singleTile: async () => switchLayer('singleTile'),
+          ion: async () => switchLayer('ion'),
+          wfs: async () => switchLayer('wfs'),
+          clear: () => {
+            vectorTileLayer.clearAll();
+            currentLayerId = null;
+            currentLayerType = null;
+          }
+        };
+        layerFolder.add(layerParams, 'wms').name('WMS图层');
+        layerFolder.add(layerParams, 'wmts').name('WMTS图层');
+        layerFolder.add(layerParams, 'xyz').name('XYZ图层');
+        layerFolder.add(layerParams, 'tms').name('TMS图层');
+        layerFolder.add(layerParams, 'singleTile').name('单张大图');
+        layerFolder.add(layerParams, 'ion').name('Cesium Ion影像');
+        layerFolder.add(layerParams, 'wfs').name('WFS矢量图层');
+        layerFolder.add(layerParams, 'clear').name('清空图层');
+
+        // 透明度调节
+        const alphaParams = {
+          alpha: 1.0,
+          setAlpha: () => {
+            if (currentLayerId && currentLayerType !== 'wfs') {
+              vectorTileLayer.updateLayer(currentLayerId, { alpha: alphaParams.alpha });
+            }
+          }
+        };
+        gui.add(alphaParams, 'alpha', 0, 1).step(0.01).name('图层透明度');
+        gui.add(alphaParams, 'setAlpha').name('应用透明度');
+
+        // 切换图层函数
+        async function switchLayer(type) {
+          vectorTileLayer.clearAll();
+          currentLayerId = null;
+          currentLayerType = type;
+          if (layersConfig[type]) {
+            const id = await vectorTileLayer.addLayer(layersConfig[type]);
+            currentLayerId = id;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

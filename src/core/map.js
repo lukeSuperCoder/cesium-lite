@@ -1,12 +1,14 @@
 import { Viewer } from 'cesium';
-
+import config from './config';
 class MapCore {
     constructor(containerId, options={}) {
         this.viewer = null;
         this.containerId = containerId;
         
         this.options = {
-            
+            ion: {
+                accessToken: config.token
+            }
         }
         this.options = Object.assign(this.options, options);
         this.initializeMap();
