@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
     base: env.VITE_BASE || '/',
     plugins: [cesium()],
     build: {
+      assetsDir: '',
+      outDir: 'dist',
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'index.html'),

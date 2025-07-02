@@ -9,7 +9,7 @@
     "build": "vite build",
     "serve": "vite build && vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist && mv dist/dist/cesium dist"
   },
   "devDependencies": {
     "cesium": "^1.127.0",
