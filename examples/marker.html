@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/cesium-lite/cesium/Widgets/widgets.css">
+    <script src="/cesium-lite/cesium/Cesium.js"></script>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create-Cesium 🌏</title>
+    
+    <style>
+      #cesiumContainer {
+        width: 100%;
+        height: 100vh;
+      }
+      .control-panel {
+        position: absolute;
+        top: 20px;
+        left: 80px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        max-width: 300px;
+      }
+      .control-panel h3 {
+        margin: 0 0 15px 0;
+        color: #333;
+        font-size: 16px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .button-group {
+        margin-bottom: 15px;
+      }
+      .button-group:last-child {
+        margin-bottom: 0;
+      }
+      .button-group h4 {
+        margin: 0 0 10px 0;
+        color: #666;
+        font-size: 14px;
+      }
+      button {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        color: #333;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      button:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
+      }
+      button:active {
+        background: #e9e9e9;
+      }
+      button:last-child {
+        margin-bottom: 0;
+      }
+      #removeAll {
+        background: #ff4d4f;
+        color: white;
+        border: none;
+      }
+      #removeAll:hover {
+        background: #ff7875;
+      }
+    </style>
+    <script type="module" crossorigin src="/cesium-lite/assets/index.8770718e.js"></script>
+    <link rel="stylesheet" href="/cesium-lite/assets/index.d8037457.css">
+  </head>
+<body>
+    <div id="cesiumContainer"></div>
+    <div class="control-panel">
+      <h3>标记点控制面板</h3>
+      
+      <div class="button-group">
+        <h4>城市标记</h4>
+        <button id="addBeijing">添加北京</button>
+        <button id="addShanghai">添加上海</button>
+        <button id="addGuangzhou">添加广州</button>
+        <button id="addShenzhen">添加深圳</button>
+      </div>
+
+      <div class="button-group">
+        <h4>图标标记</h4>
+        <button id="addIconMarker">添加图标标记</button>
+      </div>
+
+      <div class="button-group">
+        <h4>聚合标记</h4>
+        <button id="addClusterMarkers">添加聚合点</button>
+        <button id="enableClustering">启用聚合</button>
+        <button id="disableClustering">禁用聚合</button>
+      </div>
+
+      <div class="button-group">
+        <h4>批量操作</h4>
+        <button id="addMultiMarkers">添加多个标记</button>
+        <button id="removeAll">清除所有标记</button>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const cesiumLite = new CesiumLite('cesiumContainer', {
+          map: {
+            baseMap: {
+              id: 'imagery'
+            },
+            camera: {
+              longitude: 116.397428,
+              latitude: 39.90923,
+              height: 1000000,
+              heading: 0,
+              pitch: -90,
+              roll: 0
+            }
+          }
+        });
+        
+        // 初始化聚合点管理工具
+        let clusterMarker = null;
+        
+        // 添加北京标记
+        document.getElementById('addBeijing').addEventListener('click', () => {
+          cesiumLite.marker.addMarker(Cesium.Cartesian3.fromDegrees(116.397428, 39.90923),{
+            position: Cesium.Cartesian3.fromDegrees(116.397428, 39.90923),
+            point: {
+              pixelSize: 10,
+              color: Cesium.Color.RED
+            },
+            label: {
+              text: '北京',
+              font: '14px sans-serif',
+              fillColor: Cesium.Color.WHITE,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              outlineWidth: 2,
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -10)
+            }
+          })
+        });
+
+        // 添加上海标记
+        document.getElementById('addShanghai').addEventListener('click', () => {
+          cesiumLite.marker.addMarker(Cesium.Cartesian3.fromDegrees(121.473701, 31.230416),{
+            position: Cesium.Cartesian3.fromDegrees(121.473701, 31.230416),
+            point: {
+              pixelSize: 10,
+              color: Cesium.Color.BLUE
+            },
+            label: {
+              text: '上海',
+              font: '14px sans-serif',
+              fillColor: Cesium.Color.WHITE,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              outlineWidth: 2,
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -10)
+            }
+          })
+        });
+
+        // 添加广州标记
+        document.getElementById('addGuangzhou').addEventListener('click', () => {
+          cesiumLite.marker.addMarker(Cesium.Cartesian3.fromDegrees(113.264385, 23.129112),{
+            position: Cesium.Cartesian3.fromDegrees(113.264385, 23.129112),
+            point: {
+              pixelSize: 10,
+              color: Cesium.Color.GREEN
+            },
+            label: {
+              text: '广州',
+              font: '14px sans-serif',
+              fillColor: Cesium.Color.WHITE,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              outlineWidth: 2,
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -10)
+            }
+          })
+        });
+
+        // 添加深圳标记
+        document.getElementById('addShenzhen').addEventListener('click', () => {
+          cesiumLite.marker.addMarker(Cesium.Cartesian3.fromDegrees(114.057868, 22.543099),{
+            position: Cesium.Cartesian3.fromDegrees(114.057868, 22.543099),
+            point: {
+              pixelSize: 10,
+              color: Cesium.Color.PURPLE
+            },
+            label: {
+              text: '深圳',
+              font: '14px sans-serif',
+              fillColor: Cesium.Color.WHITE,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              outlineWidth: 2,
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -10)
+            }
+          })
+        });
+
+        // 添加图标标记
+        document.getElementById('addIconMarker').addEventListener('click', () => {
+          cesiumLite.marker.addMarker(Cesium.Cartesian3.fromDegrees(120.153576, 30.287459),{
+            position: Cesium.Cartesian3.fromDegrees(120.153576, 30.287459),
+            useIcon: true,
+            image: './image/cesium.svg',
+            billboard: {
+              scale: 0.5,
+            },
+            label: {
+              text: '杭州',
+              font: '14px sans-serif',
+              fillColor: Cesium.Color.WHITE,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              outlineWidth: 2,
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -30)
+            }
+          })
+        });
+
+        // 批量添加标记点
+        document.getElementById('addMultiMarkers').addEventListener('click', () => {
+          const cities = [
+            { position: [108.948024, 34.263161], text: '西安', color: Cesium.Color.ORANGE },
+            { position: [104.065735, 30.659462], text: '成都', color: Cesium.Color.DARKGREEN },
+            { position: [106.504962, 29.533155], text: '重庆', color: Cesium.Color.DARKORANGE },
+            { position: [126.642464, 45.756967], text: '哈尔滨', color: Cesium.Color.CYAN }
+          ];
+          
+          const markers = cities.map(city => (city.position,{
+            position: city.position,
+            point: {
+              pixelSize: 10,
+              color: city.color
+            },
+            label: {
+              text: city.text,
+              font: '14px sans-serif',
+              fillColor: Cesium.Color.WHITE,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              outlineWidth: 2,
+              verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+              pixelOffset: new Cesium.Cartesian2(0, -10)
+            }
+          }));
+          
+          cesiumLite.marker.addMarkers(markers);
+        });
+
+        // 清除所有标记
+        document.getElementById('removeAll').addEventListener('click', () => {
+          cesiumLite.marker.clearAll();
+          if (clusterMarker) {
+            clusterMarker.clearAll();
+          }
+        });
+        
+        // 添加聚合点
+        document.getElementById('addClusterMarkers').addEventListener('click', () => {
+          clusterMarker = cesiumLite.clusterMarker;
+          
+          // 生成随机点数据
+          const randomMarkers = [];
+          const centerLon = 116.397428;
+          const centerLat = 39.90923;
+          
+          // 在北京周围生成30个随机点
+          for (let i = 0; i < 500; i++) {
+            // 随机偏移量，范围约为方圆300公里
+            const offsetLon = (Math.random() - 0.5) * 5;
+            const offsetLat = (Math.random() - 0.5) * 5;
+            
+            randomMarkers.push({
+              position: [centerLon + offsetLon, centerLat + offsetLat],
+              point: {
+                pixelSize: 8,
+                color: Cesium.Color.fromRandom({alpha: 1.0})
+              },
+              label: {
+                text: `点位${i+1}`,
+                font: '12px sans-serif',
+                fillColor: Cesium.Color.WHITE,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                pixelOffset: new Cesium.Cartesian2(0, -10),
+                show: false // 默认不显示标签，只在点击时显示
+              }
+            });
+          }
+          
+          // 批量添加标记点
+          clusterMarker.addMarkers(randomMarkers);
+          
+          // 默认启用聚合
+          clusterMarker.enableClustering();
+        });
+        
+        // 启用聚合
+        document.getElementById('enableClustering').addEventListener('click', () => {
+          if (clusterMarker) {
+            clusterMarker.enableClustering();
+          } else {
+            alert('请先添加聚合点');
+          }
+        });
+        
+        // 禁用聚合
+        document.getElementById('disableClustering').addEventListener('click', () => {
+          if (clusterMarker) {
+            clusterMarker.disableClustering();
+          } else {
+            alert('请先添加聚合点');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

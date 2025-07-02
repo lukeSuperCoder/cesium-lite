@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <link rel="stylesheet" href="/cesium-lite/cesium/Widgets/widgets.css">
+    <script src="/cesium-lite/cesium/Cesium.js"></script>
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cesium 瓦片图层示例</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <style>
+      #cesiumContainer {
+        width: 100%;
+        height: 100vh;
+      }
+      .dg.main {
+        position: absolute;
+        top: 10px;
+        right: 100px;
+        z-index: 1000;
+      }
+    </style>
+    <script type="module" crossorigin src="/cesium-lite/assets/tileLayer.99a40cdd.js"></script>
+    <link rel="modulepreload" href="/cesium-lite/assets/index.8770718e.js">
+    <link rel="stylesheet" href="/cesium-lite/assets/index.d8037457.css">
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    
+  </body>
+</html>
