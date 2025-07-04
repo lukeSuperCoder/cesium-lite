@@ -8,8 +8,9 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite build && vite preview",
+    "fix-paths": "node scripts/fix-paths.js",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run fix-paths && gh-pages -d dist"
   },
   "devDependencies": {
     "cesium": "^1.127.0",
