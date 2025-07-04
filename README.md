@@ -64,25 +64,27 @@ CesiumLite 是一个基于 Cesium 的二次开发地图包，旨在封装常见�
 
 ## 使用方法
 
-### 开发环境
+### 方式一：通过 npm 安装（推荐）
+
+> 依赖：需自行安装 cesium 依赖包
 
 ```bash
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建项目
-npm run build
-
-# 部署到 GitHub Pages
-npm run deploy
+npm install cesium-lite cesium
 ```
 
-### 在 HTML 中引入
+在项目中引入：
 
-在 HTML 文件中使用以下方式引入：
+```js
+import CesiumLite from 'cesium-lite';
+import * as Cesium from 'cesium';
+
+// 初始化地图
+const cesiumLite = new CesiumLite('cesiumContainer', { 
+    // 配置选项
+});
+```
+
+### 方式二：在 HTML 中直接引入
 
 ```html
 <!-- 引入 Cesium 样式 -->
@@ -95,10 +97,17 @@ npm run deploy
 <script src="src/index.js"></script>
 ```
 
+### 方式三：源码本地引入
+
+```js
+import CesiumLite from './src/index.js';
+```
+
 ### 在 JavaScript 中使用
 
 ```javascript
-import CesiumLite from './index.js';
+import CesiumLite from 'cesium-lite';
+import * as Cesium from 'cesium';
 
 // 初始化地图
 const cesiumLite = new CesiumLite('cesiumContainer', { 

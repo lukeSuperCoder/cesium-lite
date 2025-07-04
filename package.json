@@ -1,9 +1,16 @@
 {
-  "name": "cesium-vite",
-  "version": "0.0.0",
+  "name": "cesium-lite",
+  "version": "1.0.0",
   "main": "index.js",
+  "description": "CesiumLite是一款开箱即用的轻量化三维地图包,基于cesium开发,旨在封装常见的地图功能模块，便于在多个前端项目中复用。",
+  "author": "lukeSuperCoder",
   "license": "MIT",
   "homepage": "https://github.com/lukeSuperCoder/cesium-lite",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lukeSuperCoder/cesium-lite.git"
+  },
+  "keywords": ["cesium", "gis", "map", "3d"],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
