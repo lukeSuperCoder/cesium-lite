@@ -8,6 +8,8 @@ CesiumLite 是一个基于 Cesium 的二次开发地图包，旨在封装常见�
 
 **演示地址：** [https://lukesupercoder.github.io/cesium-lite/](https://lukesupercoder.github.io/cesium-lite/)
 
+**npm仓库地址：** [https://www.npmjs.com/package/cesium-lite](https://www.npmjs.com/package/cesium-lite)
+
 ## 功能模块
 
 ### 已实现功能
