@@ -11,8 +11,6 @@ export default defineConfig({
       fileName: (format) => `cesium-lite.${format}.js`
     },
     rollupOptions: {
-      // 不打包 cesium 进库，让用户自己装
-      external: ['cesium'],
       output: {
         globals: {
           cesium: 'Cesium'

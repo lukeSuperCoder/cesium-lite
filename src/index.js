@@ -16,6 +16,7 @@ import './css/main.css';
 import './css/control.css';
 import config from './core/config';
 import * as Cesium from 'cesium';
+import 'cesium/Build/Cesium/Widgets/widgets.css';
 export default class CesiumLite {
     constructor(containerId, options={}) {
         Cesium.Ion.defaultAccessToken = config.token;
