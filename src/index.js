@@ -11,6 +11,7 @@ import Marker from './markers/marker';
 import ClusterMarker from './markers/clusterMarker';
 import SpatialAnalysis from './utils/spatialAnalysis';
 import VectorTileLayer from './layers/vectorTileLayer';
+import StaticFileLayer from './layers/staticFileLayer';
 import './css/main.css';
 import './css/control.css';
 import config from './core/config';
@@ -90,6 +91,8 @@ export default class CesiumLite {
         this.spatialAnalysis = new SpatialAnalysis(this.mapCore.viewer);
         // 初始化矢量图层管理模块
         this.vectorTileLayer = new VectorTileLayer(this.mapCore.viewer);
+        // 初始化静态文件图层管理模块
+        this.staticFileLayer = new StaticFileLayer(this.mapCore.viewer);
 
         if(this.options.map.controls.fullscreen) {
             this.fullscreenControl.show();

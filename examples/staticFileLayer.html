@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cesium 静态文件图层示例</title>
+    <script type="module" src="/src/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
+    <style>
+      #cesiumContainer {
+        width: 100%;
+        height: 100vh;
+      }
+      .dg.main {
+        position: absolute;
+        top: 10px;
+        right: 100px;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script type="module">
+      // 假设CesiumLite已全局可用
+      document.addEventListener('DOMContentLoaded', async () => {
+        const cesiumLite = new CesiumLite('cesiumContainer', {
+          map: {
+            baseMap: {
+              id: 'imagery'
+            },
+            camera: {
+              longitude: 116.397428,
+              latitude: 39.90923,
+              height: 1000000,
+              heading: 0,
+              pitch: -90,
+              roll: 0
+            }
+          }
+        });
+
+        // 创建静态文件图层管理工具
+        const staticFileLayer = cesiumLite.staticFileLayer;
+
+        // 示例静态文件配置
+        const staticLayersConfig = {
+          geojson: {
+            type: 'geojson',
+            url: '/cesium-lite/examples/data/100000_full.json',
+            onLoaded: (id, ds, err) => {
+              if (err) alert('GeoJSON加载失败');
+              // 地图跳转到指定经纬度（-122, 37）
+              cesiumLite.cameraControl.flyTo({
+                longitude: 102.797302689433,
+                latitude: 36.5936423859273,
+                height: 5000000,
+                heading: 0,
+                pitch: -90,
+                roll: 0,
+                duration: 2
+              });
+            }
+          },
+          kml: {
+            type: 'kml',
+            url: '/cesium-lite/examples/data/KML_Samples.kml',
+            onLoaded: (id, ds, err) => {
+              if (err) alert('KML加载失败');
+              // 地图跳转到指定经纬度（-122, 37）
+              cesiumLite.cameraControl.flyTo({
+                longitude: -122,
+                latitude: 37,
+                height: 1000000,
+                heading: 0,
+                pitch: -90,
+                roll: 0,
+                duration: 2
+              });
+            }
+          },
+          wkt: {
+            type: 'wkt',
+            data: 'POLYGON((102.797302689433 36.5936423859273,105.519115206186 29.4789248520356,100.346180647351 29.9699202912212))',
+            onLoaded: (id, ds, err) => {
+              if (err) alert('WKT加载失败');
+               // 地图跳转到指定经纬度（-122, 37）
+               cesiumLite.cameraControl.flyTo({
+                longitude: 102.797302689433,
+                latitude: 36.5936423859273,
+                height: 5000000,
+                heading: 0,
+                pitch: -90,
+                roll: 0,
+                duration: 2
+              });
+            }
+          },
+          shp: {
+            type: 'shp',
+            url: '/cesium-lite/examples/data/trsh_part.zip',
+            onLoaded: (id, ds, err) => {
+              if (err) alert('SHP加载失败');
+              // 地图跳转到指定经纬度（-122, 37）
+              cesiumLite.cameraControl.flyTo({
+                longitude: 116.797302689433,
+                latitude: 24.6936423859273,
+                height: 50000,
+                heading: 0,
+                pitch: -90,
+                roll: 0,
+                duration: 2
+              });
+            }
+          }
+        };
+
+        // 当前图层ID
+        let currentLayerId = null;
+        let currentLayerType = null;
+
+        // dat.GUI 控件
+        const gui = new dat.GUI();
+        const layerFolder = gui.addFolder('静态文件图层切换');
+        layerFolder.open();
+        const layerParams = {
+          geojson: () => switchLayer('geojson'),
+          kml: () => switchLayer('kml'),
+          wkt: () => switchLayer('wkt'),
+          shp: () => switchLayer('shp'),
+          clear: () => {
+            staticFileLayer.clearAll();
+            currentLayerId = null;
+            currentLayerType = null;
+          }
+        };
+        layerFolder.add(layerParams, 'geojson').name('GeoJSON图层');
+        layerFolder.add(layerParams, 'kml').name('KML图层');
+        layerFolder.add(layerParams, 'wkt').name('WKT图层');
+        layerFolder.add(layerParams, 'shp').name('SHP图层');
+        layerFolder.add(layerParams, 'clear').name('清空图层');
+
+        // 可见性与样式调节
+        const styleParams = {
+          visible: true,
+          setVisible: () => {
+            if (currentLayerId) {
+              staticFileLayer.setLayerVisibility(currentLayerId, styleParams.visible);
+            }
+          },
+          fill: '#00ffff',
+          applyStyle: () => {
+            if (currentLayerId) {
+              staticFileLayer.updateLayer(currentLayerId, {
+                fill: Cesium.Color.fromCssColorString(styleParams.fill).withAlpha(0.5),
+              });
+            }
+          }
+        };
+        gui.add(styleParams, 'visible').name('图层可见').onChange(styleParams.setVisible);
+        gui.addColor(styleParams, 'fill').name('填充色');
+        gui.add(styleParams, 'applyStyle').name('应用样式');
+
+        // 切换图层函数
+        function switchLayer(type) {
+          staticFileLayer.clearAll();
+          currentLayerId = null;
+          currentLayerType = type;
+          if (staticLayersConfig[type]) {
+            currentLayerId = staticFileLayer.addLayer(staticLayersConfig[type]);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

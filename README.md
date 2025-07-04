@@ -38,6 +38,13 @@ CesiumLite 是一个基于 Cesium 的二次开发地图包，旨在封装常见�
    - 图层样式控制
    - 图层切换功能
 
+6. **📂 静态GIS文件图层管理模块**：支持多种静态GIS文件的加载与管理
+   - 支持 GeoJSON、KML、WKT、SHP 等静态文件格式的加载
+   - 支持图层的添加、删除、清空、可见性控制
+   - 支持图层填充色样式动态调整
+   - 支持加载完成回调事件，便于业务处理
+   - 示例页面：`staticFileLayer.html`
+
 ### 开发中功能
 
 6. **📷 相机控制模块**：支持动态调整地图视角，飞行到指定位置等功能
@@ -124,6 +131,7 @@ cesiumLite.startDrawing('polygon', {
 - **标绘测量** (`draw.html`) - 绘制和测量功能
 - **标记点管理** (`marker.html`) - 标记点功能演示
 - **矢量图层管理** (`tileLayer.html`) - 图层管理功能
+- **静态文件图层管理** (`staticFileLayer.html`) - 加载和管理GeoJSON、KML、WKT、SHP等静态文件
 
 ## 项目结构
 
@@ -136,6 +144,7 @@ cesium-lite/
 │   ├── draw.html          # 绘制功能示例
 │   ├── marker.html        # 标记点示例
 │   ├── tileLayer.html     # 图层管理示例
+│   ├── staticFileLayer.html # 静态文件图层示例
 │   └── image/             # 示例图片资源
 ├── public/                 # 静态资源
 ├── dist/                   # 构建输出目录

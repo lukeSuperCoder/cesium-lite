@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
           entity: resolve(__dirname, 'examples/entity.html'),
           marker: resolve(__dirname, 'examples/marker.html'),
           tileLayer: resolve(__dirname, 'examples/tileLayer.html'),
+          staticFileLayer: resolve(__dirname, 'examples/staticFileLayer.html'),
         }
       }
     },
