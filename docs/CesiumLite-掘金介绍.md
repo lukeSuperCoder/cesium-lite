@@ -336,11 +336,11 @@ cesiumLite.toggleLayer('myLayer', true);
 
 项目提供了多个功能演示页面，你可以通过以下链接查看：
 
-- **[创建地图](https://lukesupercoder.github.io/cesium-lite/basicMap.html)** - 基础地图初始化
-- **[创建实体](https://lukesupercoder.github.io/cesium-lite/entity.html)** - 实体创建和管理
-- **[标绘测量](https://lukesupercoder.github.io/cesium-lite/draw.html)** - 绘制和测量功能
-- **[标记点管理](https://lukesupercoder.github.io/cesium-lite/marker.html)** - 标记点功能演示
-- **[矢量图层管理](https://lukesupercoder.github.io/cesium-lite/tileLayer.html)** - 图层管理功能
+- **[创建地图](https://lukesupercoder.github.io/cesium-lite/examples/basicMap.html)** - 基础地图初始化
+- **[创建实体](https://lukesupercoder.github.io/cesium-lite/examples/entity.html)** - 实体创建和管理
+- **[标绘测量](https://lukesupercoder.github.io/cesium-lite/examples/draw.html)** - 绘制和测量功能
+- **[标记点管理](https://lukesupercoder.github.io/cesium-lite/examples/marker.html)** - 标记点功能演示
+- **[矢量图层管理](https://lukesupercoder.github.io/cesium-lite/examples/tileLayer.html)** - 图层管理功能
 
 ## 🔧 高级用法
 
