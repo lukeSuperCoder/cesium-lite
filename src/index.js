@@ -4,12 +4,13 @@ import BasemapControl from './basemap/basemapControl';
 import FullscreenControl from './controls/fullscreenControl';
 import ZoomControl from './controls/zoomControl';
 import ScaleControl from './controls/scaleControl';
-import DrawTool from './mark/draw';
-import MeasureTool from './mark/measure';
+import DrawTool from './interaction/draw';
+import MeasureTool from './interaction/measure';
 import EntityManager from './entity/entityManager';
 import Marker from './markers/marker';
 import ClusterMarker from './markers/clusterMarker';
-import SpatialAnalysis from './utils/spatialAnalysis';
+import SpatialAnalysis from './analysis/spatialAnalysis';
+import LayerManager from './layers/layerManager';
 import VectorTileLayer from './layers/vectorTileLayer';
 import StaticFileLayer from './layers/staticFileLayer';
 import './css/main.css';
@@ -89,9 +90,11 @@ export default class CesiumLite {
         this.clusterMarker = new ClusterMarker(this.mapCore.viewer);
         // 初始化空间分析模块
         this.spatialAnalysis = new SpatialAnalysis(this.mapCore.viewer);
-        // 初始化矢量图层管理模块
+        // 初始化统一图层管理模块（推荐使用）
+        this.layerManager = new LayerManager(this.mapCore.viewer);
+        // 初始化矢量图层管理模块（保留兼容性）
         this.vectorTileLayer = new VectorTileLayer(this.mapCore.viewer);
-        // 初始化静态文件图层管理模块
+        // 初始化静态文件图层管理模块（保留兼容性）
         this.staticFileLayer = new StaticFileLayer(this.mapCore.viewer);
 
         if(this.options.map.controls.fullscreen) {

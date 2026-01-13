@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
           marker: resolve(__dirname, 'examples/marker.html'),
           tileLayer: resolve(__dirname, 'examples/tileLayer.html'),
           staticFileLayer: resolve(__dirname, 'examples/staticFileLayer.html'),
+          layerManager: resolve(__dirname, 'examples/layerManager.html'),
         }
       }
     },
