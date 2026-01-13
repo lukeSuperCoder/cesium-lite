@@ -1,6 +1,6 @@
 {
   "name": "cesium-lite",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "main": "index.js",
   "description": "CesiumLite是一款开箱即用的轻量化三维地图包,基于cesium开发,旨在封装常见的地图功能模块，便于在多个前端项目中复用。",
   "author": "lukeSuperCoder",
