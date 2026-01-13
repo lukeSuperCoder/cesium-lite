@@ -25,9 +25,10 @@
     "deploy": "npm run fix-paths && gh-pages -d dist",
     "test": "npm run build",
     "prepublishOnly": "npm run build",
-    "release:patch": "bash scripts/publish.sh patch",
-    "release:minor": "bash scripts/publish.sh minor",
-    "release:major": "bash scripts/publish.sh major"
+    "release:patch": "bash scripts/publish-2fa.sh patch",
+    "release:minor": "bash scripts/publish-2fa.sh minor",
+    "release:major": "bash scripts/publish-2fa.sh major",
+    "publish:otp": "bash scripts/publish-2fa.sh"
   },
   "devDependencies": {
     "cesium": "^1.127.0",
