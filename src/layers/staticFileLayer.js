@@ -158,6 +158,22 @@ class StaticFileLayer {
     }
 
     /**
+     * 显示图层
+     * @param {String} id 图层ID
+     */
+    showLayer(id) {
+        this.setLayerVisibility(id, true);
+    }
+
+    /**
+     * 隐藏图层
+     * @param {String} id 图层ID
+     */
+    hideLayer(id) {
+        this.setLayerVisibility(id, false);
+    }
+
+    /**
      * 更新图层参数
      * @param {String} id 图层ID
      * @param {Object} options 参数

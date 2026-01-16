@@ -62,63 +62,94 @@ const cesiumLite = new CesiumLite('cesiumContainer', {
 ### 1. 添加/切换瓦片图层（参考 tileLayer.html）
 
 ```js
-const vectorTileLayer = cesiumLite.vectorTileLayer;
+const layerManager = cesiumLite.layerManager;
 
 // 添加XYZ图层
-const xyzId = await vectorTileLayer.addLayer({
+const xyzId = await layerManager.addLayer({
   type: 'xyz',
   url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-  options: { alpha: 0.8 }
+  alpha: 0.8
+});
+
+// 添加WMS图层
+const wmsId = await layerManager.addLayer({
+  type: 'wms',
+  url: 'https://example.com/wms',
+  layers: 'layer_name'
 });
 
 // 切换图层
-vectorTileLayer.clearAll();
-await vectorTileLayer.addLayer({ type: 'wms', url: 'xxx', options: { layers: 'xxx' } });
+layerManager.clearAll();
+await layerManager.addLayer({ type: 'wmts', url: 'xxx' });
 ```
 
 ### 2. 加载静态GIS文件（参考 staticFileLayer.html）
 
 ```js
-const staticFileLayer = cesiumLite.staticFileLayer;
+const layerManager = cesiumLite.layerManager;
 
 // 加载GeoJSON
-staticFileLayer.addLayer({
+const geojsonId = layerManager.addLayer({
   type: 'geojson',
   url: 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json',
   onLoaded: (id, ds, err) => {
-    if (err) alert('GeoJSON加载失败');
+    if (err) {
+      console.error('GeoJSON加载失败', err);
+    } else {
+      console.log('GeoJSON加载成功', id);
+    }
   }
 });
 
 // 加载KML
-staticFileLayer.addLayer({
+const kmlId = layerManager.addLayer({
   type: 'kml',
   url: 'https://developers.google.com/kml/documentation/KML_Samples.kml'
 });
 
 // 加载WKT
-staticFileLayer.addLayer({
+const wktId = layerManager.addLayer({
   type: 'wkt',
   data: 'POLYGON((116 40,117 40,117 41,116 41,116 40))'
 });
 
 // 加载SHP（zip包）
-staticFileLayer.addLayer({
+const shpId = layerManager.addLayer({
   type: 'shp',
   url: 'https://cdn.jsdelivr.net/npm/shpjs@latest/test/zip/world.zip'
 });
 ```
 
-### 3. 图层样式与可见性控制
+### 3. 图层控制与管理
 
 ```js
-// 设置填充色
-staticFileLayer.updateLayer(layerId, {
-  fill: Cesium.Color.RED.withAlpha(0.5)
-});
+const layerManager = cesiumLite.layerManager;
 
-// 设置图层可见性
-staticFileLayer.setLayerVisibility(layerId, false);
+// 显示/隐藏图层
+layerManager.showLayer(layerId);
+layerManager.hideLayer(layerId);
+
+// 设置图层透明度（仅支持瓦片图层）
+layerManager.setLayerAlpha(layerId, 0.5);
+
+// 移除单个图层
+layerManager.removeLayer(layerId);
+
+// 获取图层对象
+const layer = layerManager.getLayer(layerId);
+
+// 获取所有图层ID
+const allIds = layerManager.getAllLayerIds();
+
+// 获取所有图层详细信息
+const allLayers = layerManager.getAllLayers();
+
+// 清空所有图层
+layerManager.clearAll();
+
+// 清空指定类型的图层
+layerManager.clearByType('vectorTile');  // 清空所有瓦片图层
+layerManager.clearByType('staticFile');  // 清空所有静态文件图层
 ```
 
 ### 4. 实体与标绘（参考 entity.html, draw.html）
