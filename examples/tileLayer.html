@@ -41,66 +41,56 @@
           }
         });
 
-        // 创建图层管理工具
-        const vectorTileLayer = cesiumLite.vectorTileLayer;
+        // 创建统一图层管理工具
+        const layerManager = cesiumLite.layerManager;
 
         // 示例图层配置
         const layersConfig = {
           wms: {
             type: 'wms',
             url: 'https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?',
-            options: {
-              layers: 'nexrad-n0r',
-              credit: "demo",
-              parameters: {
-                transparent: true,
-                format: 'image/png'
-              }
+            layers: 'nexrad-n0r',
+            credit: "demo",
+            parameters: {
+              transparent: true,
+              format: 'image/png'
             }
           },
           wmts: {
             type: 'wmts',
             url: 'https://tiles.maps.eox.at/wmts/1.0.0/WMTSCapabilities.xml',
-            options: {
-              layer: 's2cloudless-2021',
-              style: 'default',
-              tileMatrixSetID: 'WGS84',
-              format: 'image/png'
-            }
+            layer: 's2cloudless-2021',
+            style: 'default',
+            tileMatrixSetID: 'WGS84',
+            format: 'image/png'
           },
           xyz: {
             type: 'xyz',
             url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            options: { alpha: 0.8 }
+            alpha: 0.8
           },
           tms: {
             type: 'tms',
             url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2022-01-01/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
-            options: { alpha: 0.7 }
+            alpha: 0.7
           },
           singleTile: {
             type: 'singleTile',
-            url: 'https://upload.wikimedia.org/wikipedia/commons/3/3c/Map_of_the_world_by_the_US_Government_CIA_World_Factbook.png',
-            options: {
-              rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
-              alpha: 0.6
-            }
+            url: 'https://upload.wikimedia.org/wikipedia/commons/5/5b/Pez_%C3%A1ngel_de_barra_amarilla_%28Pomacanthus_maculosus%29%2C_parque_nacional_Ras_Muhammad%2C_Egipto%2C_2022-03-26%2C_DD_138.jpg',
+            rectangle: Cesium.Rectangle.fromDegrees(-180, -90, 180, 90),
+            alpha: 0.6
           },
           ion: {
             type: 'ion',
-            options: {
-              assetId: 3954, // 示例影像id
-              alpha: 1.0
-            }
+            assetId: 3954, // 示例影像id
+            alpha: 1.0
           },
           wfs: {
             type: 'wfs',
             url: 'https://ahocevar.com/geoserver/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=topp:states&outputFormat=application/json',
-            options: {
-              stroke: 'yellow',
-              fill: 'yellow',
-              strokeWidth: 2
-            }
+            stroke: 'yellow',
+            fill: 'yellow',
+            strokeWidth: 2
           }
         };
 
@@ -121,7 +111,7 @@
           ion: async () => switchLayer('ion'),
           wfs: async () => switchLayer('wfs'),
           clear: () => {
-            vectorTileLayer.clearAll();
+            layerManager.clearAll();
             currentLayerId = null;
             currentLayerType = null;
           }
@@ -140,7 +130,7 @@
           alpha: 1.0,
           setAlpha: () => {
             if (currentLayerId && currentLayerType !== 'wfs') {
-              vectorTileLayer.updateLayer(currentLayerId, { alpha: alphaParams.alpha });
+              layerManager.setLayerAlpha(currentLayerId, alphaParams.alpha);
             }
           }
         };
@@ -149,11 +139,11 @@
 
         // 切换图层函数
         async function switchLayer(type) {
-          vectorTileLayer.clearAll();
+          layerManager.clearAll();
           currentLayerId = null;
           currentLayerType = type;
           if (layersConfig[type]) {
-            const id = await vectorTileLayer.addLayer(layersConfig[type]);
+            const id = await layerManager.addLayer(layersConfig[type]);
             currentLayerId = id;
           }
         }

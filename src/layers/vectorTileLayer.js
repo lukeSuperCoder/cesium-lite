@@ -56,15 +56,13 @@ class VectorTileLayer {
                 imageryLayer = this.viewer.imageryLayers.addImageryProvider(layerObj);
                 break;
             case 'wmts':
-                layerObj = new WebMapTileServiceImageryProvider({
-                    url,
+                layerObj = await WebMapTileServiceImageryProvider.fromUrl(url, {
                     ...finalOptions
                 });
                 imageryLayer = this.viewer.imageryLayers.addImageryProvider(layerObj);
                 break;
             case 'arcgis':
-                layerObj = new ArcGisMapServerImageryProvider({
-                    url,
+                layerObj = await ArcGisMapServerImageryProvider.fromUrl(url, {
                     ...finalOptions
                 });
                 imageryLayer = this.viewer.imageryLayers.addImageryProvider(layerObj);
@@ -85,8 +83,7 @@ class VectorTileLayer {
                 imageryLayer = this.viewer.imageryLayers.addImageryProvider(layerObj);
                 break;
             case 'ion':
-                layerObj = new IonImageryProvider({
-                    assetId: finalOptions.assetId,
+                layerObj = await IonImageryProvider.fromAssetId(finalOptions.assetId, {
                     accessToken: finalOptions.accessToken,
                     ...finalOptions
                 });

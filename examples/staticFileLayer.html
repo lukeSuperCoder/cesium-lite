@@ -41,8 +41,8 @@
           }
         });
 
-        // 创建静态文件图层管理工具
-        const staticFileLayer = cesiumLite.staticFileLayer;
+        // 创建统一图层管理工具
+        const layerManager = cesiumLite.layerManager;
 
         // 示例静态文件配置
         const staticLayersConfig = {
@@ -130,7 +130,7 @@
           wkt: () => switchLayer('wkt'),
           shp: () => switchLayer('shp'),
           clear: () => {
-            staticFileLayer.clearAll();
+            layerManager.clearAll();
             currentLayerId = null;
             currentLayerType = null;
           }
@@ -146,15 +146,27 @@
           visible: true,
           setVisible: () => {
             if (currentLayerId) {
-              staticFileLayer.setLayerVisibility(currentLayerId, styleParams.visible);
+              if (styleParams.visible) {
+                layerManager.showLayer(currentLayerId);
+              } else {
+                layerManager.hideLayer(currentLayerId);
+              }
             }
           },
           fill: '#00ffff',
           applyStyle: () => {
             if (currentLayerId) {
-              staticFileLayer.updateLayer(currentLayerId, {
-                fill: Cesium.Color.fromCssColorString(styleParams.fill).withAlpha(0.5),
-              });
+              // 注意：layerManager 不直接支持 updateLayer，需要通过内部管理器
+              // 这里暂时保持原样，后续可以扩展 layerManager 的样式管理功能
+              const layer = layerManager.getLayer(currentLayerId);
+              if (layer && layer.dataSource) {
+                const entities = layer.dataSource.entities.values;
+                for (const entity of entities) {
+                  if (entity.polygon) {
+                    entity.polygon.material = Cesium.Color.fromCssColorString(styleParams.fill).withAlpha(0.5);
+                  }
+                }
+              }
             }
           }
         };
@@ -164,11 +176,11 @@
 
         // 切换图层函数
         function switchLayer(type) {
-          staticFileLayer.clearAll();
+          layerManager.clearAll();
           currentLayerId = null;
           currentLayerType = type;
           if (staticLayersConfig[type]) {
-            currentLayerId = staticFileLayer.addLayer(staticLayersConfig[type]);
+            currentLayerId = layerManager.addLayer(staticLayersConfig[type]);
           }
         }
       });

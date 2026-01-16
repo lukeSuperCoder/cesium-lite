@@ -30,7 +30,7 @@ class LayerManager {
      *
      * @param {Object} config 图层配置
      * @param {String} config.type 图层类型
-     *   - 瓦片图层: 'wms', 'wmts', 'arcgis', 'xyz', 'tms', 'singletile', 'ion'
+     *   - 瓦片图层: 'wms', 'wmts', 'arcgis', 'xyz', 'tms', 'singletile', 'ion', 'wfs'
      *   - 静态文件: 'geojson', 'kml', 'wkt', 'shp'
      * @param {String} config.url 图层URL（可选，某些类型需要）
      * @param {Object} config.data 内联数据（可选）
@@ -55,7 +55,7 @@ class LayerManager {
             this._layerTypeMap.set(layerId, 'staticFile');
             return layerId;
         } else {
-            throw new Error(`Unsupported layer type: ${type}. Supported types: wms, wmts, arcgis, xyz, tms, singletile, ion, geojson, kml, wkt, shp`);
+            throw new Error(`Unsupported layer type: ${type}. Supported types: wms, wmts, arcgis, xyz, tms, singletile, ion, wfs, geojson, kml, wkt, shp`);
         }
     }
 
@@ -241,7 +241,7 @@ class LayerManager {
      * @private
      */
     _isVectorTileType(type) {
-        const tileTypes = ['wms', 'wmts', 'arcgis', 'xyz', 'tms', 'singletile', 'ion'];
+        const tileTypes = ['wms', 'wmts', 'arcgis', 'xyz', 'tms', 'singletile', 'ion', 'wfs'];
         return tileTypes.includes(type.toLowerCase());
     }
 
