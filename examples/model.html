@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CesiumLite - ModelManager</title>
+    <script type="module" src="/src/index.js"></script>
+    <style>
+      #cesiumContainer {
+        width: 100%;
+        height: 100vh;
+      }
+      .panel {
+        position: absolute;
+        top: 20px;
+        left: 80px;
+        z-index: 1000;
+        width: 340px;
+        max-height: calc(100vh - 40px);
+        overflow: auto;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 8px;
+        padding: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      }
+      .panel h3 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        color: #222;
+      }
+      .section {
+        border-top: 1px solid #eee;
+        padding-top: 10px;
+        margin-top: 10px;
+      }
+      .section-title {
+        margin: 0 0 8px 0;
+        font-size: 13px;
+        color: #555;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .row > * {
+        flex: 1;
+      }
+      label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 12px;
+        background: #fff;
+      }
+      button {
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      button:hover {
+        background: #f5f5f5;
+      }
+      .btn-danger {
+        background: #ff4d4f;
+        color: #fff;
+        border: none;
+      }
+      .btn-danger:hover {
+        background: #ff7875;
+      }
+      .hint {
+        font-size: 12px;
+        color: #777;
+        line-height: 1.4;
+      }
+      pre {
+        margin: 0;
+        padding: 8px;
+        background: #0b1020;
+        color: #d7e1ff;
+        border-radius: 6px;
+        font-size: 11px;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 160px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+
+    <div class="panel">
+      <h3>三维模型管理示例</h3>
+      <div class="hint">
+        预置模型使用 Cesium Sandcastle 在线示例数据直接加载；也可使用“本地文件加载”选择 glb/gltf 文件。
+      </div>
+
+      <div class="section">
+        <div class="section-title">模型加载</div>
+        <div class="row">
+          <button id="loadMan">加载小人模型</button>
+        </div>
+        <div class="row">
+          <div>
+            <label>本地文件加载</label>
+            <input id="fileInput" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" />
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">模型列表</div>
+        <div class="row">
+          <div>
+            <label>当前模型</label>
+            <select id="modelSelect"></select>
+          </div>
+          <div style="max-width: 110px">
+            <label>&nbsp;</label>
+            <button id="refreshList">刷新</button>
+          </div>
+        </div>
+        <div class="row">
+          <button id="zoomTo">定位到模型</button>
+          <button id="toggleShow">显示/隐藏</button>
+        </div>
+        <div class="row">
+          <button id="removeOne" class="btn-danger">移除当前模型</button>
+          <button id="clearAll" class="btn-danger">清空全部</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">位置姿态与缩放</div>
+        <div class="row">
+          <div>
+            <label>经度</label>
+            <input id="lng" type="number" step="0.000001" value="116.391" />
+          </div>
+          <div>
+            <label>纬度</label>
+            <input id="lat" type="number" step="0.000001" value="39.907" />
+          </div>
+          <div>
+            <label>高度</label>
+            <input id="height" type="number" step="1" value="0" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>航向(度)</label>
+            <input id="heading" type="number" step="1" value="0" />
+          </div>
+          <div>
+            <label>俯仰(度)</label>
+            <input id="pitch" type="number" step="1" value="0" />
+          </div>
+          <div>
+            <label>翻滚(度)</label>
+            <input id="roll" type="number" step="1" value="0" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>缩放</label>
+            <input id="scale" type="number" step="0.1" value="10" />
+          </div>
+          <div style="max-width: 110px">
+            <label>&nbsp;</label>
+            <button id="applyTransform">应用</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">样式</div>
+        <div class="row">
+          <div>
+            <label>颜色</label>
+            <input id="color" type="color" value="#ff0000" />
+          </div>
+          <div>
+            <label>透明度(0-1)</label>
+            <input id="alpha" type="number" step="0.05" min="0" max="1" value="1" />
+          </div>
+          <div style="max-width: 110px">
+            <label>&nbsp;</label>
+            <button id="applyColor">应用</button>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>轮廓颜色</label>
+            <input id="silColor" type="color" value="#ffff00" />
+          </div>
+          <div>
+            <label>轮廓宽度</label>
+            <input id="silSize" type="number" step="1" min="0" value="3" />
+          </div>
+          <div style="max-width: 110px">
+            <label>&nbsp;</label>
+            <button id="applySilhouette">应用</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">动画</div>
+        <div class="row">
+          <div>
+            <label>动画索引</label>
+            <input id="animIndex" type="number" step="1" min="0" value="0" />
+          </div>
+          <div>
+            <label>速度</label>
+            <input id="animSpeed" type="number" step="0.1" min="0.1" value="1" />
+          </div>
+          <div>
+            <label>循环</label>
+            <select id="animLoop">
+              <option value="REPEAT">REPEAT</option>
+              <option value="NONE">NONE</option>
+              <option value="MIRRORED_REPEAT">MIRRORED_REPEAT</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <button id="playAnim">播放</button>
+          <button id="pauseAnim">暂停/播放</button>
+          <button id="stopAnim">停止</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">日志</div>
+        <pre id="log"></pre>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const logEl = document.getElementById("log");
+        const log = (...args) => {
+          const line = args
+            .map((v) => (typeof v === "string" ? v : JSON.stringify(v)))
+            .join(" ");
+          logEl.textContent = `${new Date().toLocaleTimeString()} ${line}\n` + logEl.textContent;
+        };
+
+        const cesiumLite = new CesiumLite("cesiumContainer", {
+          map: {
+            baseMap: { id: "imagery" },
+            camera: {
+              longitude: 116.391,
+              latitude: 39.907,
+              height: 500,
+              heading: 0,
+              pitch: -45,
+              roll: 0,
+            },
+          },
+        });
+
+        const modelSelect = document.getElementById("modelSelect");
+
+        const getSelectedId = () => modelSelect.value || "";
+
+        const refreshList = () => {
+          const models = cesiumLite.modelManager.getAllModels();
+          const selected = getSelectedId();
+          modelSelect.innerHTML = models
+            .map((m) => `<option value="${m.id}">${m.id}${m.isLoaded ? "" : " (loading)"}</option>`)
+            .join("");
+          // 保持原选中；否则默认选中第一个
+          if (models.length > 0) {
+            const keep = selected && models.some((m) => m.id === selected);
+            modelSelect.value = keep ? selected : models[0].id;
+          }
+
+          // 尽量把当前模型的 config 回填到表单
+          const current = models.find((m) => m.id === getSelectedId()) || models[0];
+          if (current?.config?.position) {
+            document.getElementById("lng").value = current.config.position.longitude ?? 0;
+            document.getElementById("lat").value = current.config.position.latitude ?? 0;
+            document.getElementById("height").value = current.config.position.height ?? 0;
+            document.getElementById("heading").value = current.config.orientation?.heading ?? 0;
+            document.getElementById("pitch").value = current.config.orientation?.pitch ?? 0;
+            document.getElementById("roll").value = current.config.orientation?.roll ?? 0;
+            document.getElementById("scale").value = current.config.scale ?? 1;
+          }
+        };
+
+        const readTransformForm = () => ({
+          position: {
+            longitude: Number(document.getElementById("lng").value),
+            latitude: Number(document.getElementById("lat").value),
+            height: Number(document.getElementById("height").value),
+          },
+          orientation: {
+            heading: Number(document.getElementById("heading").value),
+            pitch: Number(document.getElementById("pitch").value),
+            roll: Number(document.getElementById("roll").value),
+          },
+          scale: Number(document.getElementById("scale").value),
+        });
+
+        const loadByUrl = (url, extra = {}) => {
+          const base = readTransformForm();
+          const modelId = cesiumLite.modelManager.addModel({
+            url,
+            ...base,
+            ...extra,
+            onLoad: (id, model) => {
+              try {
+                log("onLoad", id);
+                refreshList();
+                modelSelect.value = id;
+                refreshList();
+                // Cesium Viewer.zoomTo 不支持 Model primitive，这里直接飞到模型包围球
+                if (model && model.boundingSphere) {
+                  cesiumLite.mapCore.viewer.camera.flyToBoundingSphere(model.boundingSphere);
+                } else {
+                  log("onLoad: boundingSphere not ready", id);
+                }
+              } catch (e) {
+                log("onLoad handler error", String(e?.message || e));
+              }
+            },
+            onError: (id, err) => {
+              try {
+                log("onError", id, String(err?.message || err));
+                refreshList();
+              } catch (e) {
+                log("onError handler error", String(e?.message || e));
+              }
+            },
+          });
+          log("addModel", modelId);
+          refreshList();
+          modelSelect.value = modelId;
+          refreshList();
+          return modelId;
+        };
+
+        document.getElementById("loadMan").addEventListener("click", () => {
+          loadByUrl("/cesium-lite/examples/data/Cesium_Man.glb");
+        });
+
+        document.getElementById("fileInput").addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          loadByUrl(file);
+          e.target.value = "";
+        });
+
+        document.getElementById("refreshList").addEventListener("click", refreshList);
+        modelSelect.addEventListener("change", refreshList);
+
+        document.getElementById("applyTransform").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("applyTransform: no model selected");
+          const t = readTransformForm();
+          cesiumLite.modelManager.updateModel(id, t);
+          refreshList();
+          log("updateModel", id);
+        });
+
+        document.getElementById("zoomTo").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("zoomTo: no model selected");
+          const model = cesiumLite.modelManager.getModel(id);
+          if (!model) return;
+          if (model.boundingSphere) {
+            cesiumLite.mapCore.viewer.camera.flyToBoundingSphere(model.boundingSphere);
+          } else {
+            log("zoomTo: model boundingSphere not ready", id);
+          }
+        });
+
+        document.getElementById("toggleShow").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("toggleShow: no model selected");
+          const model = cesiumLite.modelManager.getModel(id);
+          if (!model) return;
+          model.show ? cesiumLite.modelManager.hide(id) : cesiumLite.modelManager.show(id);
+          refreshList();
+        });
+
+        document.getElementById("removeOne").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("removeOne: no model selected");
+          cesiumLite.modelManager.removeModel(id);
+          refreshList();
+          log("removeModel", id);
+        });
+
+        document.getElementById("clearAll").addEventListener("click", () => {
+          cesiumLite.modelManager.clearModels();
+          refreshList();
+          log("clearModels");
+        });
+
+        document.getElementById("applyColor").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("applyColor: no model selected");
+          const color = document.getElementById("color").value;
+          const alpha = Number(document.getElementById("alpha").value);
+          cesiumLite.modelManager.setColor(id, color, alpha);
+          log("setColor", id, color, alpha);
+        });
+
+        document.getElementById("applySilhouette").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("applySilhouette: no model selected");
+          const color = document.getElementById("silColor").value;
+          const size = Number(document.getElementById("silSize").value);
+          cesiumLite.modelManager.setSilhouette(id, color, size);
+          log("setSilhouette", id, color, size);
+        });
+
+        const loopFromUI = () => {
+          const v = document.getElementById("animLoop").value;
+          if (v === "NONE") return Cesium.ModelAnimationLoop.NONE;
+          if (v === "MIRRORED_REPEAT") return Cesium.ModelAnimationLoop.MIRRORED_REPEAT;
+          return Cesium.ModelAnimationLoop.REPEAT;
+        };
+
+        document.getElementById("playAnim").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("playAnim: no model selected");
+          const ok = cesiumLite.modelManager.playAnimation(id, {
+            index: Number(document.getElementById("animIndex").value),
+            speed: Number(document.getElementById("animSpeed").value),
+            loop: loopFromUI(),
+          });
+          log("playAnimation", id, ok);
+          if (!ok) {
+            log("playAnimation failed: 模型可能未加载完成/无动画/速度为0");
+          }
+        });
+
+        document.getElementById("pauseAnim").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("pauseAnim: no model selected");
+          const ok = cesiumLite.modelManager.pauseAnimation(id);
+          log("pauseAnimation", id, ok);
+        });
+
+        document.getElementById("stopAnim").addEventListener("click", () => {
+          const id = getSelectedId();
+          if (!id) return log("stopAnim: no model selected");
+          const ok = cesiumLite.modelManager.stopAnimation(id);
+          log("stopAnimation", id, ok);
+        });
+
+        // 初始化列表
+        refreshList();
+        log("ready");
+      });
+    </script>
+  </body>
+</html>

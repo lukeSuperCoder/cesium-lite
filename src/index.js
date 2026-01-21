@@ -11,6 +11,7 @@ import Marker from './markers/marker';
 import ClusterMarker from './markers/clusterMarker';
 import SpatialAnalysis from './analysis/spatialAnalysis';
 import LayerManager from './layers/layerManager';
+import ModelManager from './model/modelManager';
 import './css/main.css';
 import './css/control.css';
 import config from './core/config';
@@ -58,7 +59,8 @@ export default class CesiumLite {
                     scale: true,
                     fullscreen: true
                 },
-                drawStyles: {}
+                drawStyles: {},
+                model: {}
             }
         };
         // 合并用户配置和默认配置
@@ -90,6 +92,8 @@ export default class CesiumLite {
         this.spatialAnalysis = new SpatialAnalysis(this.mapCore.viewer);
         // 初始化统一图层管理模块
         this.layerManager = new LayerManager(this.mapCore.viewer);
+        // 初始化三维模型管理模块
+        this.modelManager = new ModelManager(this.mapCore.viewer, this.options.map.model);
 
         if(this.options.map.controls.fullscreen) {
             this.fullscreenControl.show();

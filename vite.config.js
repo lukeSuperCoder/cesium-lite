@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
           draw: resolve(__dirname, 'examples/draw.html'),
           entity: resolve(__dirname, 'examples/entity.html'),
           marker: resolve(__dirname, 'examples/marker.html'),
+          model: resolve(__dirname, 'examples/model.html'),
           tileLayer: resolve(__dirname, 'examples/tileLayer.html'),
           staticFileLayer: resolve(__dirname, 'examples/staticFileLayer.html')
         }
